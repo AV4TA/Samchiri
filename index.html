@@ -47,7 +47,7 @@
       pointer-events: none;
     }
 
-    /* 우측 상단 메뉴 버튼 */
+    /* 우측 상단 메뉴 버튼 그룹 */
     .top-right-menu {
       position: absolute;
       top: 25px;
@@ -143,17 +143,6 @@
       align-items: center;
       gap: 12px;
       font-size: 1.5rem;
-    }
-
-    .user-info button {
-      background: transparent;
-      color: #ff9999;
-      border: 1px solid #ff9999;
-      padding: 2px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-family: 'Nanum Pen Script', cursive;
-      font-size: 1.3rem;
     }
 
     .menu-grid {
@@ -255,10 +244,9 @@
   <div class="blackboard-frame">
     
     <!-- 우측 상단 메뉴 -->
-    <div class="top-right-menu">
+    <div class="top-right-menu" id="topRightMenu">
       <button onclick="openModal('loginModal')">로그인</button>
       <button onclick="openModal('signupModal')">회원가입</button>
-      <button id="adminMenuBtn" style="display:none; color: #f0ad4e; border-color: #f0ad4e;" onclick="openAdminModal()">승인관리</button>
     </div>
 
     <!-- 1. 메인 홈 화면 -->
@@ -281,7 +269,7 @@
         <h2>삼치리 아지트 🏫</h2>
         <div class="user-info">
           <span id="welcomeMsg"></span>
-          <button onclick="handleLogout()">로그아웃</button>
+          <button onclick="handleLogout()" style="background:transparent; color:#ff9999; border:1px solid #ff9999; padding:2px 10px; border-radius:4px; font-family:'Nanum Pen Script'; font-size:1.3rem; cursor:pointer;">로그아웃</button>
         </div>
       </div>
 
@@ -335,7 +323,7 @@
   <script>
     if (!localStorage.getItem('samchiri_users')) {
       const initialUsers = [
-        { id: 'admin', pw: '1234', name: '관리자', approved: true, isAdmin: true }
+        { id: 'jclee17', pw: 'Ljhjc0808!', name: '관리자', approved: true, isAdmin: true }
       ];
       localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
     }
@@ -395,7 +383,12 @@
     function showHomeView() {
       document.getElementById('agitView').style.display = 'none';
       document.getElementById('homeView').style.display = 'flex';
-      document.getElementById('adminMenuBtn').style.display = 'none';
+      
+      // 로그아웃 상태일 때 우측 상단에 로그인/회원가입 버튼 표시
+      document.getElementById('topRightMenu').innerHTML = `
+        <button onclick="openModal('loginModal')">로그인</button>
+        <button onclick="openModal('signupModal')">회원가입</button>
+      `;
     }
 
     function showAgitView(user) {
@@ -403,11 +396,12 @@
       document.getElementById('agitView').style.display = 'flex';
       document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
 
+      // 로그인 상태일 때 우측 상단 메뉴 구성 (관리자면 승인관리 버튼 추가)
+      let menuHtml = '';
       if (user.isAdmin) {
-        document.getElementById('adminMenuBtn').style.display = 'block';
-      } else {
-        document.getElementById('adminMenuBtn').style.display = 'none';
+        menuHtml += `<button onclick="openAdminModal()" style="color: #f0ad4e; border-color: #f0ad4e;">승인관리</button>`;
       }
+      document.getElementById('topRightMenu').innerHTML = menuHtml;
     }
 
     function openAdminModal() {
