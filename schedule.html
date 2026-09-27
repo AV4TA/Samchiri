@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모임 일정 - 삼치리</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #2b3e32;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Nanum Pen Script', cursive, sans-serif;
+        }
+
+        .blackboard-frame {
+            background-color: #1e3328;
+            border: 12px solid #8B4513;
+            border-radius: 6px;
+            width: 94vw;
+            max-width: 1000px;
+            height: 88vh;
+            max-height: 680px;
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            color: #fff;
+        }
+
+        .blackboard-frame::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+        }
+
+        .sub-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255,255,255,0.4);
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            z-index: 1;
+        }
+
+        .sub-header h2 { font-size: 2.5rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        
+        .back-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 4px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.3rem;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .sub-content-box {
+            flex: 1;
+            background: rgba(0,0,0,0.15);
+            border-radius: 6px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            overflow-y: auto;
+            font-size: 1.5rem;
+            z-index: 1;
+        }
+
+        .chalkboard-ledge {
+            position: absolute; bottom: -15px; left: 5%; width: 90%; height: 12px;
+            background-color: #65300e; border-radius: 2px; box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+        }
+        .chalk { position: absolute; top: -7px; left: 50%; transform: translateX(-50%); width: 40px; height: 7px; background-color: #f0f0f0; border-radius: 3px; }
+        .eraser { position: absolute; top: -14px; right: 80px; width: 50px; height: 14px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px; }
+    </style>
+</head>
+<body>
+
+    <div class="blackboard-frame">
+        <div class="sub-header">
+            <h2>📅 모임 일정</h2>
+            <!-- 메인 아지트 화면으로 돌아가는 버튼 -->
+            <a href="index.html" class="back-btn">돌아가기</a>
+        </div>
+        <div class="sub-content-box">
+            <p>여기는 평고 63회 친구들의 다가오는 모임 일정을 공유하는 공간입니다. 일정 등록 기능도 나중에 추가해 드릴게요!</p>
+        </div>
+
+        <div class="chalkboard-ledge">
+            <div class="chalk"></div>
+            <div class="eraser"></div>
+        </div>
+    </div>
+
+</body>
+</html>
