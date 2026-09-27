@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>사용자 관리 - 삼치리</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nanum Pen Script', cursive, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background-color: #2b3e32;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
+
+    .blackboard-frame {
+      background-color: #1e3328;
+      border: 12px solid #8B4513;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 900px;
+      min-height: 85vh;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      padding: 30px;
+      color: #fff;
+    }
+
+    .blackboard-frame::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.1) 100%);
+      pointer-events: none;
+    }
+
+    .header-area {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed rgba(255,255,255,0.4);
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .header-area h2 {
+      font-size: 2.2rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .back-btn {
+      background: transparent;
+      color: #fff;
+      border: 2px solid rgba(255,255,255,0.6);
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      font-family: 'Nanum Pen Script', cursive;
+    }
+
+    .back-btn:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    .section-title {
+      font-size: 1.6rem;
+      border-bottom: 2px dashed rgba(255,255,255,0.3);
+      padding-bottom: 5px;
+      margin: 15px 0 10px 0;
+    }
+
+    .list-container {
+      max-height: 250px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.08);
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      border-radius: 6px;
+      font-size: 1.4rem;
+    }
+
+    select {
+      padding: 4px 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 4px;
+      color: #fff;
+      font-family: 'Nanum Pen Script', cursive;
+      font-size: 1.3rem;
+      outline: none;
+    }
+    select option { background-color: #1e3328; color: #fff; }
+
+    .action-btn-green {
+      background: #5cb85c; color: #fff; border: none; padding: 3px 10px; border-radius: 4px;
+      font-family: 'Nanum Pen Script'; font-size: 1.2rem; cursor: pointer; margin-right: 4px;
+    }
+    .action-btn-red {
+      background: #d9534f; color: #fff; border: none; padding: 3px 10px; border-radius: 4px;
+      font-family: 'Nanum Pen Script'; font-size: 1.2rem; cursor: pointer;
+    }
+
+    .chalkboard-ledge {
+      position: absolute;
+      bottom: -16px;
+      left: 5%;
+      width: 90%;
+      height: 12px;
+      background-color: #65300e;
+      border-radius: 2px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+    }
+    .chalk {
+      position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 6px; background-color: #f0f0f0; border-radius: 3px;
+    }
+    .eraser {
+      position: absolute; top: -12px; right: 80px;
+      width: 50px; height: 12px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="blackboard-frame">
+    <div class="header-area">
+      <h2>👑 사용자 관리 페이지</h2>
+      <button class="back-btn" onclick="location.href='index.html'">아지트로 돌아가기</button>
+    </div>
+
+    <div>
+      <div class="section-title">📋 가입 대기 목록</div>
+      <div class="list-container" id="pendingList"></div>
+
+      <div class="section-title">👥 전체 회원 및 권한 관리 (계장은 단 1명만 가능)</div>
+      <div class="list-container" id="memberList"></div>
+    </div>
+
+    <div class="chalkboard-ledge">
+      <div class="chalk"></div>
+      <div class="eraser"></div>
+    </div>
+  </div>
+
+  <script>
+    window.onload = function() {
+      // 관리자 권한 확인 (관리자가 아니면 메인으로 튕겨냄)
+      const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
+      if (!loginUser || !loginUser.isAdmin) {
+        alert('관리자만 접근할 수 있습니다!');
+        location.href = 'index.html';
+        return;
+      }
+      renderAdminData();
+    };
+
+    function renderAdminData() {
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      const pendingListDiv = document.getElementById('pendingList');
+      const memberListDiv = document.getElementById('memberList');
+      
+      pendingListDiv.innerHTML = '';
+      memberListDiv.innerHTML = '';
+
+      // 1. 가입 대기 목록 렌더링
+      const pendingUsers = users.filter(u => !u.approved);
+      if (pendingUsers.length === 0) {
+        pendingListDiv.innerHTML = '<p style="text-align:center; color:#aaa; padding: 10px;">대기 중인 친구가 없습니다.</p>';
+      } else {
+        pendingUsers.forEach(u => {
+          const item = document.createElement('div');
+          item.className = 'list-item';
+          item.innerHTML = `
+            <span>${u.name} (${u.id})</span>
+            <div>
+              <button class="action-btn-green" onclick="approveUser('${u.id}')">승인</button>
+              <button class="action-btn-red" onclick="rejectUser('${u.id}')">거절</button>
+            </div>
+          `;
+          pendingListDiv.appendChild(item);
+        });
+      }
+
+      // 2. 승인된 전체 회원 권한 관리 렌더링
+      const approvedUsers = users.filter(u => u.approved);
+      approvedUsers.forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        
+        let actionControl = '';
+        if (!u.isAdmin) {
+          actionControl = `
+            <select onchange="changeUserRole('${u.id}', this.value)">
+              <option value="일반회원" ${u.role === '일반회원' ? 'selected' : ''}>일반회원</option>
+              <option value="계장" ${u.role === '계장' ? 'selected' : ''}>👑 계장</option>
+            </select>
+          `;
+        } else {
+          actionControl = `<span style="color: #f0ad4e;">관리자 (본인)</span>`;
+        }
+
+        item.innerHTML = `
+          <span>${u.name} (${u.id})</span>
+          <div>${actionControl}</div>
+        `;
+        memberListDiv.appendChild(item);
+      });
+    }
+
+    function approveUser(userId) {
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      users = users.map(u => { if (u.id === userId) u.approved = true; return u; });
+      localStorage.setItem('samchiri_users', JSON.stringify(users));
+      renderAdminData();
+    }
+
+    function rejectUser(userId) {
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      users = users.filter(u => u.id !== userId);
+      localStorage.setItem('samchiri_users', JSON.stringify(users));
+      renderAdminData();
+    }
+
+    function changeUserRole(userId, newRole) {
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      
+      // 계장은 1명만 가능하므로 다른 사람을 계장으로 주면 기존 계장은 일반회원으로 변경
+      if (newRole === '계장') {
+        users = users.map(u => {
+          if (u.role === '계장') u.role = '일반회원';
+          return u;
+        });
+      }
+
+      users = users.map(u => {
+        if (u.id === userId) u.role = newRole;
+        return u;
+      });
+
+      localStorage.setItem('samchiri_users', JSON.stringify(users));
+      alert('권한이 변경되었습니다!');
+      renderAdminData();
+    }
+  </script>
+</body>
+</html>
