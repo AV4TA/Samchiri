@@ -152,7 +152,7 @@
             justify-content: flex-start;
             align-items: flex-start;
             font-size: 1.1rem;
-            min-height: 105px;
+            min-height: 110px;
             position: relative;
         }
 
@@ -174,7 +174,7 @@
             font-weight: bold;
         }
 
-        /* 완벽하게 이어지는 연속 바 스타일 */
+        /* 타임트리 스타일 연속 바 */
         .bar-container {
             display: flex;
             flex-direction: column;
@@ -187,7 +187,7 @@
         .schedule-bar {
             height: 22px;
             line-height: 22px;
-            padding: 0 8px;
+            padding: 0 6px;
             font-size: 0.95rem;
             font-weight: bold;
             overflow: hidden;
@@ -209,11 +209,10 @@
             color: #1e3328;
         }
 
-        /* 날짜별 바 연결 모양 제어 */
-        .bar-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: 0; width: calc(100% + 4px); }
-        .bar-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-right: 0; width: calc(100% + 4px); }
-        .bar-middle { border-radius: 0; margin-left: -4px; width: calc(100% + 8px); }
-        .bar-single { border-radius: 4px; width: 100%; }
+        .bar-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+        .bar-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+        .bar-single { border-radius: 4px; }
+        .bar-middle { border-radius: 0; }
 
         /* 모달 스타일 */
         .modal {
@@ -429,7 +428,7 @@
                 nextMonthDay++;
             }
 
-            daysData.forEach((dInfo, index) => {
+            daysData.forEach((dInfo) => {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'cal-day' + (dInfo.isOther ? ' other-month' : '') + (dInfo.isToday ? ' today' : '');
                 
@@ -439,41 +438,63 @@
                 barContainer.className = 'bar-container';
 
                 schedules.forEach(item => {
+                    // 일정이 해당 날짜를 포함하고, 혹은 "주말에 걸쳐 연속된 구간의 시작일이거나 해당 주의 첫 날"인 경우에만 바를 그려줌
+                    let dDate = new Date(dInfo.dateStr);
+                    let sDate = new Date(item.start);
+                    let eDate = new Date(item.end);
+
                     if (dInfo.dateStr >= item.start && dInfo.dateStr <= item.end) {
-                        const bar = document.createElement('div');
-                        let typeClass = item.type === 'poll' ? 'poll' : 'event';
-                        bar.className = `schedule-bar ${typeClass}`;
+                        // 만약 주말을 넘어가는 경우, 매주 일요일마다 바를 끊어서 각각의 주에 독립된 바가 보이게 처리 (타임트리 방식)
+                        let dayOfWeek = dDate.getDay(); // 0: 일요일
+                        let isStartOfRange = (dInfo.dateStr === item.start);
+                        let isFirstDayOfWeek = (dayOfWeek === 0);
 
-                        let dayOfWeek = index % 7; // 0: 일요일, 6: 토요일
-                        let isStart = (dInfo.dateStr === item.start);
-                        let isEnd = (dInfo.dateStr === item.end);
-                        let isSaturday = (dayOfWeek === 6);
-                        let isSunday = (dayOfWeek === 0);
+                        if (isStartOfRange || isFirstDayOfWeek) {
+                            const bar = document.createElement('div');
+                            let typeClass = item.type === 'poll' ? 'poll' : 'event';
+                            bar.className = `schedule-bar ${typeClass}`;
 
-                        if (isStart && isEnd) {
-                            bar.classList.add('bar-single');
-                        } else if (isStart || isSunday) {
-                            bar.classList.add('bar-start');
-                        } else if (isEnd || isSaturday) {
-                            bar.classList.add('bar-end');
-                        } else {
-                            bar.classList.add('bar-middle');
+                            // 이 주에 끝나는지 확인
+                            let currentSunday = new Date(dDate);
+                            let daysToSaturday = 6 - dayOfWeek;
+                            let currentSaturday = new Date(currentSunday);
+                            currentSaturday.setDate(currentSunday.getDate() + daysToSaturday);
+                            let saturdayStr = formatDate(currentSaturday);
+
+                            let actualEndInThisWeek = item.end < saturdayStr ? item.end : saturdayStr;
+                            
+                            // 너비 계산 (며칠 동안 이어지는지)
+                            let diffTime = new Date(actualEndInThisWeek) - new Date(dInfo.dateStr);
+                            let diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+                            bar.style.width = `calc(${diffDays * 100}% + ${(diffDays - 1) * 4}px)`;
+                            bar.style.position = 'absolute';
+                            bar.style.left = '4px';
+                            bar.style.zIndex = '5';
+
+                            if (isStartOfRange) bar.classList.add('bar-start');
+                            else bar.classList.add('bar-middle');
+
+                            if (actualEndInThisWeek === item.end) {
+                                if (isStartOfRange) bar.classList.add('bar-single');
+                                else bar.classList.add('bar-end');
+                            }
+
+                            if (item.type === 'poll') {
+                                let totalVotes = 0;
+                                if (item.votes) Object.values(item.votes).forEach(arr => totalVotes += arr.length);
+                                bar.innerText = `📊 ${item.text} (${totalVotes})`;
+                            } else {
+                                bar.innerText = item.text;
+                            }
+
+                            bar.onclick = (e) => {
+                                e.stopPropagation();
+                                openDetailModal(item.id);
+                            };
+
+                            barContainer.appendChild(bar);
                         }
-
-                        if (item.type === 'poll') {
-                            let totalVotes = 0;
-                            if (item.votes) Object.values(item.votes).forEach(arr => totalVotes += arr.length);
-                            bar.innerText = `📊 ${item.text} (${totalVotes})`;
-                        } else {
-                            bar.innerText = item.text;
-                        }
-
-                        bar.onclick = (e) => {
-                            e.stopPropagation();
-                            openDetailModal(item.id);
-                        };
-
-                        barContainer.appendChild(bar);
                     }
                 });
 
