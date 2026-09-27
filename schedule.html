@@ -146,7 +146,7 @@
             gap: 4px;
         }
 
-        /* 날짜 칸 높이를 넉넉하게 조정하여 찌그러짐 방지 */
+        /* 날짜 칸 */
         .cal-day {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -157,14 +157,11 @@
             justify-content: flex-start;
             align-items: flex-start;
             font-size: 1.1rem;
-            min-height: 95px;
+            min-height: 105px;
             position: relative;
-            cursor: pointer;
-            overflow: hidden;
             transition: all 0.2s;
         }
 
-        .cal-day:hover { background: rgba(255, 255, 255, 0.08); border-color: rgba(255,255,255,0.2); }
         .cal-day.other-month { color: rgba(255, 255, 255, 0.25); }
 
         .cal-day.today {
@@ -183,33 +180,46 @@
             font-weight: bold;
         }
 
-        .cal-event {
-            background: rgba(255, 230, 140, 0.9);
-            color: #2b3e32;
-            font-size: 0.9rem;
-            padding: 1px 4px;
-            border-radius: 3px;
-            margin-top: 2px;
+        /* 타임트리 스타일의 이어지는 가로 바(Bar) */
+        .bar-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
             width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-weight: bold;
+            margin-top: 3px;
+            z-index: 2;
         }
 
-        .cal-poll {
-            background: rgba(140, 210, 255, 0.9);
-            color: #1e3328;
-            font-size: 0.85rem;
-            padding: 1px 4px;
-            border-radius: 3px;
-            margin-top: 2px;
-            width: 100%;
+        .schedule-bar {
+            height: 22px;
+            line-height: 22px;
+            padding: 0 6px;
+            font-size: 0.95rem;
+            font-weight: bold;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            transition: filter 0.2s;
         }
+        .schedule-bar:hover { filter: brightness(1.15); }
+
+        .schedule-bar.event {
+            background: rgba(255, 230, 140, 0.92);
+            color: #2b3e32;
+        }
+
+        .schedule-bar.poll {
+            background: rgba(140, 210, 255, 0.92);
+            color: #1e3328;
+        }
+
+        /* 바 모서리 부드럽게 (시작일/종료일에 따라 다르게) */
+        .bar-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: 2px; }
+        .bar-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-right: 2px; }
+        .bar-middle { border-radius: 0; }
+        .bar-single { border-radius: 4px; margin: 0 2px; }
 
         /* 팝업 모달 */
         .modal {
@@ -403,50 +413,86 @@
             const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
             const todayDate = today.getDate();
 
+            // 날짜 칸들을 미리 배열로 생성
+            let daysData = [];
+
+            // 지난달 빈 칸
             for (let i = firstDayIndex; i > 0; i--) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'cal-day other-month';
-                dayDiv.innerHTML = `<span class="day-num">${prevLastDay - i + 1}</span>`;
-                grid.appendChild(dayDiv);
+                let d = new Date(year, month, 1);
+                d.setDate(d.getDate() - i);
+                daysData.push({ dateStr: formatDate(d), dayNum: d.getDate(), isOther: true });
             }
 
+            // 이번달 날짜
             for (let i = 1; i <= lastDay; i++) {
-                const dayDiv = document.createElement('div');
-                dayDiv.className = 'cal-day';
-                
-                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                
-                if (isCurrentMonth && i === todayDate) {
-                    dayDiv.classList.add('today');
-                }
+                let dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                daysData.push({ dateStr: dateStr, dayNum: i, isOther: false, isToday: (isCurrentMonth && i === todayDate) });
+            }
 
-                dayDiv.innerHTML = `<span class="day-num">${i}</span>`;
+            // 다음달 빈 칸으로 7주 단위 맞추기
+            let totalCells = Math.ceil(daysData.length / 7) * 7;
+            let nextMonthDay = 1;
+            while (daysData.length < totalCells) {
+                let nextMonth = month + 1;
+                let nextYear = year;
+                if (nextMonth > 11) { nextMonth = 0; nextYear++; }
+                let dateStr = `${nextYear}-${String(nextMonth + 1).padStart(2, '0')}-${String(nextMonthDay).padStart(2, '0')}`;
+                daysData.push({ dateStr: dateStr, dayNum: nextMonthDay, isOther: true });
+                nextMonthDay++;
+            }
+
+            // 화면에 렌더링
+            daysData.forEach(dInfo => {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'cal-day' + (dInfo.isOther ? ' other-month' : '') + (dInfo.isToday ? ' today' : '');
+                
+                dayDiv.innerHTML = `<span class="day-num">${dInfo.dayNum}</span>`;
+
+                // 해당 날짜에 걸치는 일정들을 바 형태로 표시하기 위한 컨테이너
+                const barContainer = document.createElement('div');
+                barContainer.className = 'bar-container';
 
                 schedules.forEach(item => {
-                    if (dateStr >= item.start && dateStr <= item.end) {
-                        const div = document.createElement('div');
-                        if (item.type === 'poll') {
-                            div.className = 'cal-poll';
-                            let totalVotes = 0;
-                            if(item.votes) {
-                                Object.values(item.votes).forEach(arr => totalVotes += arr.length);
-                            }
-                            div.innerText = `📊 ${item.text} (${totalVotes})`;
+                    if (dInfo.dateStr >= item.start && dInfo.dateStr <= item.end) {
+                        const bar = document.createElement('div');
+                        let typeClass = item.type === 'poll' ? 'poll' : 'event';
+                        bar.className = `schedule-bar ${typeClass}`;
+
+                        // 시작일, 종료일, 중간일에 따라 모서리 모양 다르게 부여
+                        if (dInfo.dateStr === item.start && dInfo.dateStr === item.end) {
+                            bar.classList.add('bar-single');
+                        } else if (dInfo.dateStr === item.start) {
+                            bar.classList.add('bar-start');
+                        } else if (dInfo.dateStr === item.end) {
+                            bar.classList.add('bar-end');
                         } else {
-                            div.className = 'cal-event';
-                            div.innerText = item.text;
+                            bar.classList.add('bar-middle');
                         }
-                        
-                        div.onclick = (e) => {
+
+                        if (item.type === 'poll') {
+                            let totalVotes = 0;
+                            if (item.votes) Object.values(item.votes).forEach(arr => totalVotes += arr.length);
+                            bar.innerText = `📊 ${item.text} (${totalVotes})`;
+                        } else {
+                            bar.innerText = item.text;
+                        }
+
+                        bar.onclick = (e) => {
                             e.stopPropagation();
                             openDetailModal(item.id);
                         };
-                        dayDiv.appendChild(div);
+
+                        barContainer.appendChild(bar);
                     }
                 });
 
+                dayDiv.appendChild(barContainer);
                 grid.appendChild(dayDiv);
-            }
+            });
+        }
+
+        function formatDate(d) {
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
         }
 
         function changeMonth(direction) {
