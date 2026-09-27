@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -6,21 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>삼치리 - 평택고등학교 63회</title>
 
-  <!-- PWA & 모바일 홈 화면 설정 -->
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="삼치리" />
   <meta name="theme-color" content="#1e3328" />
 
   <link rel="manifest" href="manifest.json" />
-  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/School.png" />
-  <link rel="icon" href="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/School.png" />
-
-  <!-- FontAwesome & Google Fonts (분필 손글씨 폰트 적용) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 
   <style>
@@ -35,7 +25,6 @@
       padding: 10px;
     }
 
-    /* 칠판 프레임 */
     .blackboard-frame {
       background-color: #1e3328;
       border: 12px solid #8B4513;
@@ -47,11 +36,9 @@
       box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       padding: 30px;
     }
 
-    /* 칠판 질감 오버레이 */
     .blackboard-frame::before {
       content: "";
       position: absolute;
@@ -87,15 +74,15 @@
       border-style: solid;
     }
 
-    /* 1. 메인 홈 화면 (칠판 중앙 '삼치리' + 우측 하단 '떠든 사람') */
+    /* 1. 메인 홈 화면 */
     #homeView {
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       flex: 1;
+      width: 100%;
       position: relative;
-      z-index: 2;
     }
 
     .center-title h1 {
@@ -106,11 +93,10 @@
       letter-spacing: 6px;
     }
 
-    /* 우측 하단 떠든 사람 (이름만 깔끔하게) */
     .troublemakers {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
+      bottom: 10px;
+      right: 10px;
       text-align: right;
       color: #ffffff;
     }
@@ -133,6 +119,7 @@
       display: none;
       flex-direction: column;
       flex: 1;
+      width: 100%;
       z-index: 2;
       color: #fff;
     }
@@ -169,7 +156,6 @@
       font-size: 1.3rem;
     }
 
-    /* 메뉴 카드 그리드 */
     .menu-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -190,7 +176,6 @@
       transition: all 0.2s;
       text-decoration: none;
       color: #fff;
-      position: relative;
     }
 
     .menu-card:hover {
@@ -203,7 +188,7 @@
     .menu-card h3 { font-size: 1.8rem; margin-bottom: 4px; }
     .menu-card p { font-size: 1.2rem; color: #ccc; }
 
-    /* 모달창 스타일 */
+    /* 모달 */
     .modal {
       display: none;
       position: fixed;
@@ -245,7 +230,6 @@
       color: #fff; font-size: 1.8rem; cursor: pointer;
     }
 
-    /* 하단 분필 받침대 */
     .chalkboard-ledge {
       position: absolute;
       bottom: -16px;
@@ -283,7 +267,6 @@
         <h1>삼치리</h1>
       </div>
 
-      <!-- 우측 하단 떠든 사람 (이름만 나열) -->
       <div class="troublemakers">
         <h3>떠든 사람</h3>
         <div class="names">
@@ -306,12 +289,11 @@
         <a href="schedule.html" class="menu-card">
           <div class="icon">📅</div>
           <h3>모임 일정</h3>
-          <p>다음 동창회 언제?</p>
+          <p>다음 모임 언제?</p>
         </a>
       </div>
     </div>
 
-    <!-- 하단 받침대 소품 -->
     <div class="chalkboard-ledge">
       <div class="chalk"></div>
       <div class="eraser"></div>
@@ -351,7 +333,6 @@
   </div>
 
   <script>
-    // 초기 관리자 계정 생성 (아이디: admin, 비번: 1234)
     if (!localStorage.getItem('samchiri_users')) {
       const initialUsers = [
         { id: 'admin', pw: '1234', name: '관리자', approved: true, isAdmin: true }
@@ -363,6 +344,8 @@
       const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
       if (loginUser) {
         showAgitView(loginUser);
+      } else {
+        showHomeView();
       }
     };
 
@@ -406,6 +389,10 @@
 
     function handleLogout() {
       localStorage.removeItem('samchiri_login_user');
+      showHomeView();
+    }
+
+    function showHomeView() {
       document.getElementById('agitView').style.display = 'none';
       document.getElementById('homeView').style.display = 'flex';
       document.getElementById('adminMenuBtn').style.display = 'none';
@@ -418,6 +405,8 @@
 
       if (user.isAdmin) {
         document.getElementById('adminMenuBtn').style.display = 'block';
+      } else {
+        document.getElementById('adminMenuBtn').style.display = 'none';
       }
     }
 
@@ -458,10 +447,6 @@
       users = users.filter(u => u.id !== userId);
       localStorage.setItem('samchiri_users', JSON.stringify(users));
       openAdminModal();
-    }
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
     }
   </script>
 </body>
