@@ -36,7 +36,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 30px;
         }
 
         .blackboard-frame::before {
@@ -47,7 +47,8 @@
             pointer-events: none;
         }
 
-        .center-content {
+        /* 비로그인 시 메인 화면 영역 */
+        #homeView {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -56,17 +57,13 @@
             width: 100%;
         }
 
-        .center-content h1 {
+        #homeView h1 {
             font-size: clamp(5rem, 15vw, 9rem);
             color: #f7f9f6;
             font-weight: normal;
-            text-shadow: 
-                0 0 2px rgba(255, 255, 255, 0.8),
-                2px 2px 5px rgba(0, 0, 0, 0.5),
-                0 0 15px rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.8), 2px 2px 5px rgba(0, 0, 0, 0.5);
             letter-spacing: 8px;
             margin-bottom: 25px;
-            white-space: nowrap;
         }
 
         .auth-buttons {
@@ -84,7 +81,6 @@
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
         }
 
         .auth-buttons button:hover {
@@ -92,7 +88,111 @@
             border-style: solid;
         }
 
-        /* 팝업 모달 */
+        /* 로그인 후 아지트 페이지 영역 */
+        #agitView {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            color: #fff;
+        }
+
+        .agit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255,255,255,0.4);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .agit-header h2 {
+            font-size: 2.5rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 1.5rem;
+        }
+
+        .user-info button {
+            background: transparent;
+            color: #ff9999;
+            border: 1px solid #ff9999;
+            padding: 3px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.2rem;
+        }
+
+        /* 아지트 내부 콘텐츠 (방명록/자유게시판) */
+        .board-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .board-input-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .board-input-box input {
+            flex: 1;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.4rem;
+            outline: none;
+        }
+
+        .board-input-box input::placeholder { color: rgba(255,255,255,0.5); }
+
+        .board-input-box button {
+            padding: 0 20px;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid #fff;
+            color: #fff;
+            border-radius: 4px;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        .posts-list {
+            flex: 1;
+            overflow-y: auto;
+            background: rgba(0,0,0,0.15);
+            border-radius: 6px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .post-item {
+            background: rgba(255,255,255,0.08);
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .post-content { color: #f0f0f0; }
+        .post-author { font-size: 1.1rem; color: #a0d8a0; }
+
+        /* 팝업 모달 공통 */
         .modal {
             display: none;
             position: fixed;
@@ -118,113 +218,71 @@
             overflow-y: auto;
         }
 
-        .modal-content h2 {
-            font-size: 2.2rem;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
-
+        .modal-content h2 { font-size: 2.2rem; margin-bottom: 20px; }
         .modal-content input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 4px;
-            color: #fff;
-            font-family: 'Nanum Pen Script', cursive;
-            font-size: 1.4rem;
-            outline: none;
+            width: 100%; padding: 10px; margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px; color: #fff; font-family: 'Nanum Pen Script', cursive; font-size: 1.4rem; outline: none;
         }
-
-        .modal-content input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
+        .modal-content input::placeholder { color: rgba(255, 255, 255, 0.5); }
         .modal-content button.submit-btn {
-            width: 100%;
-            padding: 8px;
-            background-color: #2b3e32;
-            color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.7);
-            border-radius: 4px;
-            font-family: 'Nanum Pen Script', cursive;
-            font-size: 1.5rem;
-            cursor: pointer;
-            margin-top: 5px;
+            width: 100%; padding: 8px; background-color: #2b3e32; color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 4px;
+            font-family: 'Nanum Pen Script', cursive; font-size: 1.5rem; cursor: pointer;
         }
-
         .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 1.8rem;
-            cursor: pointer;
-            font-family: sans-serif;
+            position: absolute; top: 10px; right: 15px; background: none; border: none;
+            color: #fff; font-size: 1.8rem; cursor: pointer; font-family: sans-serif;
         }
 
-        /* 관리자 대기 목록 스타일 */
-        .admin-list {
-            text-align: left;
-            margin-top: 15px;
-        }
+        .admin-list { text-align: left; margin-top: 15px; }
         .admin-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255,255,255,0.08);
-            padding: 8px 12px;
-            margin-bottom: 8px;
-            border-radius: 4px;
-            font-size: 1.3rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.08); padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; font-size: 1.3rem;
         }
-        .admin-item button {
-            background: #d9534f;
-            color: white;
-            border: none;
-            padding: 3px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Nanum Pen Script', cursive;
-            font-size: 1.2rem;
-        }
-        .admin-item button.approve {
-            background: #5cb85c;
-            margin-right: 5px;
-        }
+        .admin-item button { background: #d9534f; color: white; border: none; padding: 3px 10px; border-radius: 4px; cursor: pointer; font-family: 'Nanum Pen Script', cursive; font-size: 1.2rem; }
+        .admin-item button.approve { background: #5cb85c; margin-right: 5px; }
 
         .chalkboard-ledge {
-            position: absolute;
-            bottom: -15px;
-            left: 5%5%;
-            width: 90%;
-            height: 12px;
-            background-color: #65300e;
-            border-radius: 2px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+            position: absolute; bottom: -15px; left: 5%; width: 90%; height: 12px;
+            background-color: #65300e; border-radius: 2px; box-shadow: 0 5px 10px rgba(0,0,0,0.4);
         }
-
-        .chalk {
-            position: absolute; top: -7px; left: 50%; transform: translateX(-50%); width: 40px; height: 7px; background-color: #f0f0f0; border-radius: 3px;
-        }
-
-        .eraser {
-            position: absolute; top: -14px; right: 80px; width: 50px; height: 14px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px;
-        }
+        .chalk { position: absolute; top: -7px; left: 50%; transform: translateX(-50%); width: 40px; height: 7px; background-color: #f0f0f0; border-radius: 3px; }
+        .eraser { position: absolute; top: -14px; right: 80px; width: 50px; height: 14px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px; }
     </style>
 </head>
 <body>
 
     <div class="blackboard-frame">
-        <div class="center-content">
+        
+        <!-- 1. 로그인 전 메인 화면 -->
+        <div id="homeView">
             <h1>삼치리</h1>
             <div class="auth-buttons">
                 <button onclick="openModal('loginModal')">로그인</button>
                 <button onclick="openModal('signupModal')">회원가입</button>
                 <button id="adminBtn" style="display:none; border-color: #f0ad4e; color: #f0ad4e;" onclick="openAdminModal()">가입승인관리</button>
+            </div>
+        </div>
+
+        <!-- 2. 로그인 후 아지트(게시판) 화면 -->
+        <div id="agitView">
+            <div class="agit-header">
+                <h2>삼치리 아지트 🏫</h2>
+                <div class="user-info">
+                    <span id="welcomeMsg"></span>
+                    <button id="agitAdminBtn" style="display:none; color: #f0ad4e; border-color: #f0ad4e;" onclick="openAdminModal()">가입승인관리</button>
+                    <button onclick="handleLogout()">로그아웃</button>
+                </div>
+            </div>
+            <div class="board-container">
+                <div class="board-input-box">
+                    <input type="text" id="postInput" placeholder="친구들에게 한마디 남겨봐 (방명록)">
+                    <button onclick="writePost()">글 남기기</button>
+                </div>
+                <div id="postsList" class="posts-list">
+                    <!-- 작성된 글들이 여기에 쌓임 -->
+                </div>
             </div>
         </div>
 
@@ -262,14 +320,12 @@
         <div class="modal-content" style="max-width: 480px;">
             <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
             <h2>가입 대기 목록</h2>
-            <div id="pendingList" class="admin-list">
-                <!-- 대기 중인 친구들이 여기에 동적으로 표시됨 -->
-            </div>
+            <div id="pendingList" class="admin-list"></div>
         </div>
     </div>
 
     <script>
-        // 초기 관리자 계정 생성 (최초 접속 시 자동 생성: 아이디 admin / 비번 1234)
+        // 초기 관리자 계정 세팅 (admin / 1234)
         if (!localStorage.getItem('samchiri_users')) {
             const initialUsers = [
                 { id: 'admin', pw: '1234', name: '관리자(너)', approved: true, isAdmin: true }
@@ -277,95 +333,136 @@
             localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
         }
 
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
-        }
+        // 페이지 켜질 때 로그인 상태 체크
+        window.onload = function() {
+            const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
+            if (loginUser) {
+                showAgitView(loginUser);
+            }
+        };
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
+        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
-        // 회원가입 신청
         function handleSignup() {
             const id = document.getElementById('signupId').value.trim();
             const pw = document.getElementById('signupPw').value.trim();
             const name = document.getElementById('signupName').value.trim();
 
-            if (!id || !pw || !name) {
-                alert('모든 칸을 채워주세요!');
-                return;
-            }
+            if (!id || !pw || !name) { alert('모든 칸을 채워주세요!'); return; }
 
             let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            
-            if (users.some(user => user.id === id)) {
-                alert('이미 존재하는 아이디입니다!');
-                return;
-            }
+            if (users.some(u => u.id === id)) { alert('이미 존재하는 아이디입니다!'); return; }
 
-            // approved: false (관리자 승인 대기 상태)
             users.push({ id, pw, name, approved: false, isAdmin: false });
             localStorage.setItem('samchiri_users', JSON.stringify(users));
             
-            alert('가입 신청이 완료되었습니다! 관리자(너)가 승인하면 로그인할 수 있어요.');
+            alert('가입 신청 완료! 관리자 승인을 기다려주세요.');
             closeModal('signupModal');
             document.getElementById('signupId').value = '';
             document.getElementById('signupPw').value = '';
             document.getElementById('signupName').value = '';
         }
 
-        // 로그인 처리
         function handleLogin() {
             const id = document.getElementById('loginId').value.trim();
             const pw = document.getElementById('loginPw').value.trim();
 
-            if (!id || !pw) {
-                alert('아이디와 비밀번호를 입력해주세요!');
-                return;
-            }
+            if (!id || !pw) { alert('아이디와 비밀번호를 입력해주세요!'); return; }
 
             let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            const foundUser = users.find(user => user.id === id && user.pw === pw);
+            const foundUser = users.find(u => u.id === id && u.pw === pw);
 
             if (foundUser) {
-                if (!foundUser.approved) {
-                    alert('아직 관리자 승인이 완료되지 않은 계정입니다!');
-                    return;
-                }
+                if (!foundUser.approved) { alert('아직 관리자 승인이 안 된 계정입니다!'); return; }
 
-                alert(`반가워요, ${foundUser.name}님! 환영합니다.`);
                 localStorage.setItem('samchiri_login_user', JSON.stringify(foundUser));
                 closeModal('loginModal');
-
-                // 관리자일 경우 승인 버튼 노출
-                if (foundUser.isAdmin) {
-                    document.getElementById('adminBtn').style.display = 'block';
-                    alert('관리자 모드가 활성화되었습니다. 우측의 [가입승인관리] 버튼을 눌러 친구들을 승인해 주세요.');
-                }
+                document.getElementById('loginId').value = '';
+                document.getElementById('loginPw').value = '';
+                showAgitView(foundUser);
             } else {
                 alert('아이디나 비밀번호가 틀렸습니다.');
             }
         }
 
-        // 관리자 모달 열기 (대기 목록 불러오기)
+        function handleLogout() {
+            localStorage.removeItem('samchiri_login_user');
+            document.getElementById('agitView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'flex';
+        }
+
+        function showAgitView(user) {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('agitView').style.display = 'flex';
+            document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
+
+            if (user.isAdmin) {
+                document.getElementById('adminBtn').style.display = 'block';
+                document.getElementById('agitAdminBtn').style.display = 'block';
+            } else {
+                document.getElementById('adminBtn').style.display = 'none';
+                document.getElementById('agitAdminBtn').style.display = 'none';
+            }
+            loadPosts();
+        }
+
+        // 방명록 글 쓰기
+        function writePost() {
+            const input = document.getElementById('postInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
+            let posts = JSON.parse(localStorage.getItem('samchiri_posts') || '[]');
+
+            posts.unshift({ name: loginUser.name, text: text, date: new Date().toLocaleDateString() });
+            localStorage.setItem('samchiri_posts', JSON.stringify(posts));
+
+            input.value = '';
+            loadPosts();
+        }
+
+        // 방명록 불러오기
+        function loadPosts() {
+            const postsList = document.getElementById('postsList');
+            let posts = JSON.parse(localStorage.getItem('samchiri_posts') || '[]');
+            postsList.innerHTML = '';
+
+            if (posts.length === 0) {
+                postsList.innerHTML = '<p style="text-align:center; color:#aaa; margin-top:20px;">아직 남겨진 글이 없어요. 첫 글을 작성해 보세요!</p>';
+                return;
+            }
+
+            posts.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'post-item';
+                item.innerHTML = `
+                    <div class="post-content">${p.text}</div>
+                    <div class="post-author">${p.name} (${p.date})</div>
+                `;
+                postsList.appendChild(item);
+            });
+        }
+
+        // 관리자 모달
         function openAdminModal() {
             let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
             const pendingListDiv = document.getElementById('pendingList');
             pendingListDiv.innerHTML = '';
 
-            const pendingUsers = users.filter(user => !user.approved);
-
+            const pendingUsers = users.filter(u => !u.approved);
             if (pendingUsers.length === 0) {
                 pendingListDiv.innerHTML = '<p style="text-align:center; color:#aaa; padding: 20px;">대기 중인 친구가 없습니다.</p>';
             } else {
-                pendingUsers.forEach(user => {
+                pendingUsers.forEach(u => {
                     const item = document.createElement('div');
                     item.className = 'admin-item';
                     item.innerHTML = `
-                        <span>${user.name} (${user.id})</span>
+                        <span>${u.name} (${u.id})</span>
                         <div>
-                            <button class="approve" onclick="approveUser('${user.id}')">승인</button>
-                            <button onclick="rejectUser('${user.id}')">거절</button>
+                            <button class="approve" onclick="approveUser('${u.id}')">승인</button>
+                            <button onclick="rejectUser('${u.id}')">거절</button>
                         </div>
                     `;
                     pendingListDiv.appendChild(item);
@@ -374,25 +471,20 @@
             openModal('adminModal');
         }
 
-        // 가입 승인
         function approveUser(userId) {
             let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            users = users.map(user => {
-                if (user.id === userId) user.approved = true;
-                return user;
-            });
+            users = users.map(u => { if (u.id === userId) u.approved = true; return u; });
             localStorage.setItem('samchiri_users', JSON.stringify(users));
-            alert('승인되었습니다!');
-            openAdminModal(); // 목록 새로고침
+            alert('승인 완료!');
+            openAdminModal();
         }
 
-        // 가입 거절 (삭제)
         function rejectUser(userId) {
             let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            users = users.filter(user => user.id !== userId);
+            users = users.filter(u => u.id !== userId);
             localStorage.setItem('samchiri_users', JSON.stringify(users));
-            alert('거절(삭제)되었습니다.');
-            openAdminModal(); // 목록 새로고침
+            alert('거절되었습니다.');
+            openAdminModal();
         }
     </script>
 
