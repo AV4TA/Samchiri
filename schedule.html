@@ -28,8 +28,9 @@
             border-radius: 6px;
             width: 100%;
             max-width: 1000px;
-            /* 세로로 긴 화면(접었을 때)에서도 찌그러지지 않고 내용에 맞춰 늘어나도록 수정 */
-            min-height: 90vh;
+            /* 세로/가로 화면에서 잘리지 않고 유연하게 반응하도록 수정 */
+            height: auto;
+            min-height: 85vh;
             position: relative;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
             display: flex;
@@ -75,7 +76,6 @@
 
         /* 타임트리 스타일 달력 컨테이너 */
         .calendar-container {
-            flex: 1;
             display: flex;
             flex-direction: column;
             background: rgba(0,0,0,0.15);
@@ -120,12 +120,11 @@
         .cal-weekdays div:first-child { color: #ff9999; }
         .cal-weekdays div:last-child { color: #99ccff; }
 
-        /* 날짜 그리드 (모바일 세로 화면에서도 칸들이 찌그러지지 않도록 최소 높이 부여) */
+        /* 날짜 그리드 */
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             gap: 4px;
-            flex: 1;
         }
 
         .cal-day {
@@ -138,14 +137,13 @@
             justify-content: flex-start;
             align-items: flex-start;
             font-size: 1.1rem;
-            min-height: 65px; /* 접었을 때 칸이 너무 찌그러지지 않도록 최소 높이 설정 */
+            min-height: 75px;
             position: relative;
             cursor: pointer;
             transition: background 0.2s;
         }
 
         .cal-day:hover { background: rgba(255, 255, 255, 0.12); }
-
         .cal-day.other-month { color: rgba(255, 255, 255, 0.3); }
 
         .cal-event {
@@ -210,12 +208,6 @@
 
         let currentDate = new Date();
 
-        const sampleEvents = {
-            "2026-09-30": "추석 연휴 모임 🍻",
-            "2026-10-15": "평고 63회 정기 동창회",
-            "2026-10-25": "김민수 생일 🎂"
-        };
-
         function renderCalendar() {
             const year = currentDate.getFullYear();
             const month = currentDate.getMonth();
@@ -229,6 +221,10 @@
             const grid = document.getElementById('calGrid');
             grid.innerHTML = '';
 
+            // 저장된 일정 불러오기
+            const savedEvents = JSON.parse(localStorage.getItem('samchiri_events') || '{}');
+
+            // 지난달 빈 칸
             for (let i = firstDayIndex; i > 0; i--) {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'cal-day other-month';
@@ -236,6 +232,7 @@
                 grid.appendChild(dayDiv);
             }
 
+            // 이번달 날짜
             for (let i = 1; i <= lastDay; i++) {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'cal-day';
@@ -244,12 +241,28 @@
                 
                 dayDiv.innerHTML = `<span>${i}</span>`;
 
-                if (sampleEvents[dateStr]) {
+                // 해당 날짜에 저장된 일정이 있으면 표시
+                if (savedEvents[dateStr]) {
                     const eventDiv = document.createElement('div');
                     eventDiv.className = 'cal-event';
-                    eventDiv.innerText = sampleEvents[dateStr];
+                    eventDiv.innerText = savedEvents[dateStr];
                     dayDiv.appendChild(eventDiv);
                 }
+
+                // 날짜 클릭 시 일정 추가 기능
+                dayDiv.onclick = function() {
+                    let eventText = prompt(`${year}년 ${month + 1}월 ${i}일에 추가할 일정을 적어주세요!\n(삭제하려면 내용을 비우고 확인을 누르세요)`);
+                    if (eventText !== null) {
+                        let events = JSON.parse(localStorage.getItem('samchiri_events') || '{}');
+                        if (eventText.trim() === "") {
+                            delete events[dateStr]; // 빈칸이면 삭제
+                        } else {
+                            events[dateStr] = eventText.trim();
+                        }
+                        localStorage.setItem('samchiri_events', JSON.stringify(events));
+                        renderCalendar();
+                    }
+                };
 
                 grid.appendChild(dayDiv);
             }
