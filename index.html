@@ -1,504 +1,469 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <!-- PWA 매니페스트 연결 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1e3328">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>삼치리 - 평택고등학교 63회</title>
 
-    <!-- 서비스 워커 및 동적 학교 이모티콘 아이콘 생성기 -->
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then((reg) => { console.log('Service Worker 등록 성공!', reg); })
-            .catch((err) => { console.log('Service Worker 등록 실패:', err); });
-        });
-      }
+  <!-- PWA & 모바일 홈 화면 설정 -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="삼치리" />
+  <meta name="theme-color" content="#1e3328" />
 
-      // 🏫 학교 이모티콘으로 192, 512 아이콘 자동 생성해서 캐시에 밀어넣기
-      async function generateIcons() {
-        const sizes = [192, 512];
-        for (let size of sizes) {
-          const canvas = document.createElement('canvas');
-          canvas.width = size;
-          canvas.height = size;
-          const ctx = canvas.getContext('2d');
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/School.png" />
+  <link rel="icon" href="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Travel%20and%20places/School.png" />
 
-          // 칠판 초록색 배경
-          ctx.fillStyle = '#1e3328';
-          ctx.fillRect(0, 0, size, size);
+  <!-- FontAwesome & Google Fonts (분필 손글씨 폰트 적용) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
 
-          // 테두리
-          ctx.strokeStyle = '#8B4513';
-          ctx.lineWidth = size * 0.04;
-          ctx.strokeRect(0, 0, size, size);
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Nanum Pen Script', cursive, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      background-color: #2b3e32;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 10px;
+    }
 
-          // 학교 이모티콘 🏫 그리기
-          ctx.font = `${size * 0.5}px sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText('🏫', size / 2, size / 2);
+    /* 칠판 프레임 */
+    .blackboard-frame {
+      background-color: #1e3328;
+      border: 12px solid #8B4513;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 900px;
+      min-height: 85vh;
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 30px;
+    }
 
-          const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-          const cache = await caches.open('samchiri-v1');
-          await cache.put(`/icon-${size}.png`, new Response(blob));
-        }
-      }
-      generateIcons();
-    </script>
+    /* 칠판 질감 오버레이 */
+    .blackboard-frame::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.1) 100%);
+      pointer-events: none;
+    }
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>삼치리 - 평택고등학교 63회</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    /* 우측 상단 메뉴 버튼 */
+    .top-right-menu {
+      position: absolute;
+      top: 25px;
+      right: 30px;
+      display: flex;
+      gap: 10px;
+      z-index: 5;
+    }
 
-        body {
-            background-color: #2b3e32;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Nanum Pen Script', cursive, sans-serif;
-            padding: 10px;
-        }
+    .top-right-menu button {
+      background: transparent;
+      color: #ffffff;
+      font-size: 1.4rem;
+      border: 2px dashed rgba(255, 255, 255, 0.6);
+      padding: 4px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-family: 'Nanum Pen Script', cursive;
+      transition: all 0.2s;
+    }
 
-        .blackboard-frame {
-            background-color: #1e3328;
-            border: 10px solid #8B4513;
-            border-radius: 6px;
-            width: 100%;
-            max-width: 1000px;
-            min-height: 90vh;
-            position: relative;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+    .top-right-menu button:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-style: solid;
+    }
 
-        .blackboard-frame::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.1) 100%);
-            pointer-events: none;
-        }
+    /* 1. 메인 홈 화면 (칠판 중앙 '삼치리' + 우측 하단 '떠든 사람') */
+    #homeView {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      flex: 1;
+      position: relative;
+      z-index: 2;
+    }
 
-        /* 1. 로그인 전 메인 화면 */
-        #homeView {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            z-index: 1;
-            width: 100%;
-        }
+    .center-title h1 {
+      font-size: clamp(5rem, 15vw, 9rem);
+      color: #ffffff;
+      font-weight: normal;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.4), 0 0 12px rgba(255,255,255,0.7);
+      letter-spacing: 6px;
+    }
 
-        #homeView h1 {
-            font-size: clamp(4rem, 12vw, 8rem);
-            color: #f7f9f6;
-            font-weight: normal;
-            text-shadow: 0 0 2px rgba(255, 255, 255, 0.8), 2px 2px 5px rgba(0, 0, 0, 0.5);
-            letter-spacing: 8px;
-            margin-bottom: 20px;
-        }
+    /* 우측 하단 떠든 사람 (이름만 깔끔하게) */
+    .troublemakers {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      text-align: right;
+      color: #ffffff;
+    }
 
-        .auth-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
+    .troublemakers h3 {
+      font-size: 1.6rem;
+      margin-bottom: 4px;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+    }
 
-        .auth-buttons button {
-            background: transparent;
-            color: #ffffff;
-            font-family: 'Nanum Pen Script', cursive;
-            font-size: clamp(1.2rem, 4vw, 1.5rem);
-            border: 2px dashed rgba(255, 255, 255, 0.6);
-            padding: 6px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+    .troublemakers .names {
+      font-size: 1.4rem;
+      color: #dcdcdc;
+      line-height: 1.3;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
 
-        .auth-buttons button:hover {
-            background-color: rgba(255, 255, 255, 0.15);
-            border-style: solid;
-        }
+    /* 2. 로그인 후 아지트 대시보드 화면 */
+    #agitView {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      z-index: 2;
+      color: #fff;
+    }
 
-        /* 2. 로그인 후 대시보드 화면 */
-        #agitView {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            color: #fff;
-        }
+    .agit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed rgba(255,255,255,0.4);
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+    }
 
-        .agit-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px dashed rgba(255,255,255,0.4);
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+    .agit-header h2 {
+      font-size: 2.2rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    }
 
-        .agit-header h2 {
-            font-size: 2rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-        }
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.5rem;
+    }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3rem;
-        }
+    .user-info button {
+      background: transparent;
+      color: #ff9999;
+      border: 1px solid #ff9999;
+      padding: 2px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Nanum Pen Script', cursive;
+      font-size: 1.3rem;
+    }
 
-        .user-info button {
-            background: transparent;
-            color: #ff9999;
-            border: 1px solid #ff9999;
-            padding: 2px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Nanum Pen Script', cursive;
-            font-size: 1.1rem;
-        }
+    /* 메뉴 카드 그리드 */
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 10px 0;
+    }
 
-        .menu-grid {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex: 1;
-            padding: 20px 0;
-        }
+    .menu-card {
+      background: rgba(255, 255, 255, 0.07);
+      border: 2px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      padding: 25px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: #fff;
+      position: relative;
+    }
 
-        .menu-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 2px solid rgba(255, 255, 255, 0.25);
-            border-radius: 8px;
-            padding: 25px 40px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-decoration: none;
-            color: #fff;
-            position: relative;
-        }
+    .menu-card:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.6);
+      transform: translateY(-3px);
+    }
 
-        .menu-card:hover {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: translateY(-3px);
-        }
+    .menu-card .icon { font-size: 3rem; margin-bottom: 10px; }
+    .menu-card h3 { font-size: 1.8rem; margin-bottom: 4px; }
+    .menu-card p { font-size: 1.2rem; color: #ccc; }
 
-        .menu-card .icon {
-            font-size: 2.8rem;
-            margin-bottom: 8px;
-        }
+    /* 모달창 스타일 */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      padding: 15px;
+    }
 
-        .menu-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 4px;
-            color: #fff;
-        }
+    .modal-content {
+      background-color: #1e3328;
+      border: 4px solid #8B4513;
+      border-radius: 8px;
+      padding: 25px;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      color: #fff;
+    }
 
-        .menu-card p {
-            font-size: 1.2rem;
-            color: #ccc;
-        }
+    .modal-content h2 { font-size: 2.2rem; margin-bottom: 15px; }
+    .modal-content input {
+      width: 100%; padding: 8px 12px; margin-bottom: 12px;
+      background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 4px; color: #fff; font-family: 'Nanum Pen Script', cursive; font-size: 1.5rem; outline: none;
+    }
+    .modal-content input::placeholder { color: rgba(255, 255, 255, 0.5); }
+    .modal-content button.submit-btn {
+      width: 100%; padding: 8px; background-color: #2b3e32; color: #fff;
+      border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 4px;
+      font-family: 'Nanum Pen Script', cursive; font-size: 1.6rem; cursor: pointer;
+    }
+    .close-btn {
+      position: absolute; top: 10px; right: 15px; background: none; border: none;
+      color: #fff; font-size: 1.8rem; cursor: pointer;
+    }
 
-        .main-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background-color: #d9534f;
-            color: white;
-            font-size: 1.1rem;
-            padding: 2px 8px;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-            font-weight: bold;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-            padding: 15px;
-        }
-
-        .modal-content {
-            background-color: #1e3328;
-            border: 4px solid #8B4513;
-            border-radius: 8px;
-            padding: 25px;
-            width: 100%;
-            max-width: 380px;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            color: #fff;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-
-        .modal-content h2 { font-size: 2rem; margin-bottom: 15px; }
-        .modal-content input {
-            width: 100%; padding: 8px 10px; margin-bottom: 12px;
-            background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.4);
-            border-radius: 4px; color: #fff; font-family: 'Nanum Pen Script', cursive; font-size: 1.3rem; outline: none;
-        }
-        .modal-content input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        .modal-content button.submit-btn {
-            width: 100%; padding: 8px; background-color: #2b3e32; color: #fff;
-            border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 4px;
-            font-family: 'Nanum Pen Script', cursive; font-size: 1.4rem; cursor: pointer;
-        }
-        .close-btn {
-            position: absolute; top: 10px; right: 15px; background: none; border: none;
-            color: #fff; font-size: 1.6rem; cursor: pointer; font-family: sans-serif;
-        }
-
-        .admin-list { text-align: left; margin-top: 15px; }
-        .admin-item {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255,255,255,0.08); padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; font-size: 1.2rem;
-        }
-        .admin-item button { background: #d9534f; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-family: 'Nanum Pen Script', cursive; font-size: 1.1rem; }
-        .admin-item button.approve { background: #5cb85c; margin-right: 5px; }
-
-        .chalkboard-ledge {
-            position: absolute; bottom: -12px; left: 5%; width: 90%; height: 10px;
-            background-color: #65300e; border-radius: 2px; box-shadow: 0 5px 10px rgba(0,0,0,0.4);
-        }
-        .chalk { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 35px; height: 6px; background-color: #f0f0f0; border-radius: 3px; }
-        .eraser { position: absolute; top: -12px; right: 70px; width: 45px; height: 12px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px; }
-    </style>
+    /* 하단 분필 받침대 */
+    .chalkboard-ledge {
+      position: absolute;
+      bottom: -16px;
+      left: 5%;
+      width: 90%;
+      height: 12px;
+      background-color: #65300e;
+      border-radius: 2px;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+    }
+    .chalk {
+      position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+      width: 40px; height: 6px; background-color: #f0f0f0; border-radius: 3px;
+    }
+    .eraser {
+      position: absolute; top: -12px; right: 80px;
+      width: 50px; height: 12px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px;
+    }
+  </style>
 </head>
 <body>
 
-    <div class="blackboard-frame">
-        <div id="homeView">
-            <h1>삼치리</h1>
-            <div class="auth-buttons">
-                <button onclick="openModal('loginModal')">로그인</button>
-                <button onclick="openModal('signupModal')">회원가입</button>
-                <button id="adminBtn" style="display:none; border-color: #f0ad4e; color: #f0ad4e;" onclick="openAdminModal()">가입승인관리</button>
+  <div class="blackboard-frame">
+    
+    <!-- 우측 상단 메뉴 -->
+    <div class="top-right-menu">
+      <button onclick="openModal('loginModal')">로그인</button>
+      <button onclick="openModal('signupModal')">회원가입</button>
+      <button id="adminMenuBtn" style="display:none; color: #f0ad4e; border-color: #f0ad4e;" onclick="openAdminModal()">승인관리</button>
+    </div>
+
+    <!-- 1. 메인 홈 화면 -->
+    <div id="homeView">
+      <div class="center-title">
+        <h1>삼치리</h1>
+      </div>
+
+      <!-- 우측 하단 떠든 사람 (이름만 나열) -->
+      <div class="troublemakers">
+        <h3>떠든 사람</h3>
+        <div class="names">
+          김민수<br>
+          박지호<br>
+          이민석
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 로그인 후 아지트 대시보드 화면 -->
+    <div id="agitView">
+      <div class="agit-header">
+        <h2>삼치리 아지트 🏫</h2>
+        <div class="user-info">
+          <span id="welcomeMsg"></span>
+          <button onclick="handleLogout()">로그아웃</button>
+        </div>
+      </div>
+
+      <div class="menu-grid">
+        <a href="schedule.html" class="menu-card">
+          <div class="icon">📅</div>
+          <h3>모임 일정</h3>
+          <p>다음 동창회 언제?</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- 하단 받침대 소품 -->
+    <div class="chalkboard-ledge">
+      <div class="chalk"></div>
+      <div class="eraser"></div>
+    </div>
+  </div>
+
+  <!-- 로그인 모달 -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+      <h2>로그인</h2>
+      <input type="text" id="loginId" placeholder="아이디">
+      <input type="password" id="loginPw" placeholder="비밀번호">
+      <button class="submit-btn" onclick="handleLogin()">들어가기</button>
+    </div>
+  </div>
+
+  <!-- 회원가입 모달 -->
+  <div id="signupModal" class="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal('signupModal')">&times;</button>
+      <h2>회원가입</h2>
+      <input type="text" id="signupId" placeholder="사용할 아이디">
+      <input type="password" id="signupPw" placeholder="비밀번호">
+      <input type="text" id="signupName" placeholder="이름 (예: 홍길동)">
+      <button class="submit-btn" onclick="handleSignup()">가입 신청하기</button>
+    </div>
+  </div>
+
+  <!-- 관리자 승인 모달 -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+      <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
+      <h2>가입 대기 목록</h2>
+      <div id="pendingList" style="text-align: left; margin-top: 15px;"></div>
+    </div>
+  </div>
+
+  <script>
+    // 초기 관리자 계정 생성 (아이디: admin, 비번: 1234)
+    if (!localStorage.getItem('samchiri_users')) {
+      const initialUsers = [
+        { id: 'admin', pw: '1234', name: '관리자', approved: true, isAdmin: true }
+      ];
+      localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
+    }
+
+    window.onload = function() {
+      const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
+      if (loginUser) {
+        showAgitView(loginUser);
+      }
+    };
+
+    function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+    function handleSignup() {
+      const id = document.getElementById('signupId').value.trim();
+      const pw = document.getElementById('signupPw').value.trim();
+      const name = document.getElementById('signupName').value.trim();
+
+      if (!id || !pw || !name) { alert('모든 칸을 채워주세요!'); return; }
+
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      if (users.some(u => u.id === id)) { alert('이미 존재하는 아이디입니다!'); return; }
+
+      users.push({ id, pw, name, approved: false, isAdmin: false });
+      localStorage.setItem('samchiri_users', JSON.stringify(users));
+      
+      alert('가입 신청 완료! 관리자 승인을 기다려주세요.');
+      closeModal('signupModal');
+    }
+
+    function handleLogin() {
+      const id = document.getElementById('loginId').value.trim();
+      const pw = document.getElementById('loginPw').value.trim();
+
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      const foundUser = users.find(u => u.id === id && u.pw === pw);
+
+      if (foundUser) {
+        if (!foundUser.approved) { alert('아직 관리자 승인이 안 된 계정입니다!'); return; }
+
+        localStorage.setItem('samchiri_login_user', JSON.stringify(foundUser));
+        closeModal('loginModal');
+        showAgitView(foundUser);
+      } else {
+        alert('아이디나 비밀번호가 틀렸습니다.');
+      }
+    }
+
+    function handleLogout() {
+      localStorage.removeItem('samchiri_login_user');
+      document.getElementById('agitView').style.display = 'none';
+      document.getElementById('homeView').style.display = 'flex';
+      document.getElementById('adminMenuBtn').style.display = 'none';
+    }
+
+    function showAgitView(user) {
+      document.getElementById('homeView').style.display = 'none';
+      document.getElementById('agitView').style.display = 'flex';
+      document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
+
+      if (user.isAdmin) {
+        document.getElementById('adminMenuBtn').style.display = 'block';
+      }
+    }
+
+    function openAdminModal() {
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      const pendingListDiv = document.getElementById('pendingList');
+      pendingListDiv.innerHTML = '';
+
+      const pendingUsers = users.filter(u => !u.approved);
+      if (pendingUsers.length === 0) {
+        pendingListDiv.innerHTML = '<p style="text-align:center; color:#aaa; padding: 15px;">대기 중인 친구가 없습니다.</p>';
+      } else {
+        pendingUsers.forEach(u => {
+          const item = document.createElement('div');
+          item.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.08); padding:8px; margin-bottom:6px; border-radius:4px; font-size:1.3rem;";
+          item.innerHTML = `
+            <span>${u.name} (${u.id})</span>
+            <div>
+              <button onclick="approveUser('${u.id}')" style="background:#5cb85c; color:#fff; border:none; padding:2px 8px; border-radius:3px; font-family:'Nanum Pen Script'; font-size:1.1rem; cursor:pointer; margin-right:4px;">승인</button>
+              <button onclick="rejectUser('${u.id}')" style="background:#d9534f; color:#fff; border:none; padding:2px 8px; border-radius:3px; font-family:'Nanum Pen Script'; font-size:1.1rem; cursor:pointer;">거절</button>
             </div>
-        </div>
+          `;
+          pendingListDiv.appendChild(item);
+        });
+      }
+      openModal('adminModal');
+    }
 
-        <div id="agitView">
-            <div class="agit-header">
-                <h2>삼치리 아지트 🏫</h2>
-                <div class="user-info">
-                    <span id="welcomeMsg"></span>
-                    <button id="agitAdminBtn" style="display:none; color: #f0ad4e; border-color: #f0ad4e;" onclick="openAdminModal()">승인관리</button>
-                    <button onclick="handleLogout()">로그아웃</button>
-                </div>
-            </div>
-            <div class="menu-grid" id="menuGridContainer"></div>
-        </div>
+    function approveUser(userId) {
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      users = users.map(u => { if (u.id === userId) u.approved = true; return u; });
+      localStorage.setItem('samchiri_users', JSON.stringify(users));
+      openAdminModal();
+    }
 
-        <div class="chalkboard-ledge">
-            <div class="chalk"></div>
-            <div class="eraser"></div>
-        </div>
-    </div>
+    function rejectUser(userId) {
+      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+      users = users.filter(u => u.id !== userId);
+      localStorage.setItem('samchiri_users', JSON.stringify(users));
+      openAdminModal();
+    }
 
-    <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
-            <h2>로그인</h2>
-            <input type="text" id="loginId" placeholder="아이디">
-            <input type="password" id="loginPw" placeholder="비밀번호">
-            <button class="submit-btn" onclick="handleLogin()">들어가기</button>
-        </div>
-    </div>
-
-    <div id="signupModal" class="modal">
-        <div class="modal-content">
-            <button class="close-btn" onclick="closeModal('signupModal')">&times;</button>
-            <h2>회원가입</h2>
-            <input type="text" id="signupId" placeholder="사용할 아이디">
-            <input type="password" id="signupPw" placeholder="비밀번호">
-            <input type="text" id="signupName" placeholder="이름 (예: 홍길동)">
-            <button class="submit-btn" onclick="handleSignup()">가입 신청하기</button>
-        </div>
-    </div>
-
-    <div id="adminModal" class="modal">
-        <div class="modal-content" style="max-width: 420px;">
-            <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
-            <h2>가입 대기 목록</h2>
-            <div id="pendingList" class="admin-list"></div>
-        </div>
-    </div>
-
-    <script>
-        if (!localStorage.getItem('samchiri_users')) {
-            const initialUsers = [
-                { id: 'admin', pw: '1234', name: '관리자(너)', approved: true, isAdmin: true }
-            ];
-            localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
-        }
-
-        window.onload = function() {
-            const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
-            if (loginUser) {
-                showAgitView(loginUser);
-            }
-        };
-
-        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
-        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
-
-        function handleSignup() {
-            const id = document.getElementById('signupId').value.trim();
-            const pw = document.getElementById('signupPw').value.trim();
-            const name = document.getElementById('signupName').value.trim();
-
-            if (!id || !pw || !name) { alert('모든 칸을 채워주세요!'); return; }
-
-            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            if (users.some(u => u.id === id)) { alert('이미 존재하는 아이디입니다!'); return; }
-
-            users.push({ id, pw, name, approved: false, isAdmin: false });
-            localStorage.setItem('samchiri_users', JSON.stringify(users));
-            
-            alert('가입 신청 완료! 관리자 승인을 기다려주세요.');
-            closeModal('signupModal');
-            document.getElementById('signupId').value = '';
-            document.getElementById('signupPw').value = '';
-            document.getElementById('signupName').value = '';
-        }
-
-        function handleLogin() {
-            const id = document.getElementById('loginId').value.trim();
-            const pw = document.getElementById('loginPw').value.trim();
-
-            if (!id || !pw) { alert('아이디와 비밀번호를 입력해주세요!'); return; }
-
-            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            const foundUser = users.find(u => u.id === id && u.pw === pw);
-
-            if (foundUser) {
-                if (!foundUser.approved) { alert('아직 관리자 승인이 안 된 계정입니다!'); return; }
-
-                localStorage.setItem('samchiri_login_user', JSON.stringify(foundUser));
-                closeModal('loginModal');
-                document.getElementById('loginId').value = '';
-                document.getElementById('loginPw').value = '';
-                showAgitView(foundUser);
-            } else {
-                alert('아이디나 비밀번호가 틀렸습니다.');
-            }
-        }
-
-        function handleLogout() {
-            localStorage.removeItem('samchiri_login_user');
-            document.getElementById('agitView').style.display = 'none';
-            document.getElementById('homeView').style.display = 'flex';
-        }
-
-        function showAgitView(user) {
-            document.getElementById('homeView').style.display = 'none';
-            document.getElementById('agitView').style.display = 'flex';
-            document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
-
-            if (user.isAdmin) {
-                document.getElementById('adminBtn').style.display = 'block';
-                document.getElementById('agitAdminBtn').style.display = 'block';
-            } else {
-                document.getElementById('adminBtn').style.display = 'none';
-                document.getElementById('agitAdminBtn').style.display = 'none';
-            }
-
-            const schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
-            let unvotedCount = schedules.filter(item => {
-                if (item.type !== 'poll') return false;
-                let voted = false;
-                Object.values(item.votes).forEach(arr => {
-                    if (arr.includes(user.name)) voted = true;
-                });
-                return !voted;
-            }).length;
-
-            let badgeHtml = unvotedCount > 0 ? `<span class="main-badge">미투표 ${unvotedCount}</span>` : '';
-
-            document.getElementById('menuGridContainer').innerHTML = `
-                <a href="schedule.html" class="menu-card">
-                    <div class="icon">📅</div>
-                    <h3>모임 일정</h3>
-                    <p>다음 동창회 언제 하지?</p>
-                    ${badgeHtml}
-                </a>
-            `;
-        }
-
-        function openAdminModal() {
-            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            const pendingListDiv = document.getElementById('pendingList');
-            pendingListDiv.innerHTML = '';
-
-            const pendingUsers = users.filter(u => !u.approved);
-            if (pendingUsers.length === 0) {
-                pendingListDiv.innerHTML = '<p style="text-align:center; color:#aaa; padding: 20px;">대기 중인 친구가 없습니다.</p>';
-            } else {
-                pendingUsers.forEach(u => {
-                    const item = document.createElement('div');
-                    item.className = 'admin-item';
-                    item.innerHTML = `
-                        <span>${u.name} (${u.id})</span>
-                        <div>
-                            <button class="approve" onclick="approveUser('${u.id}')">승인</button>
-                            <button onclick="rejectUser('${u.id}')">거절</button>
-                        </div>
-                    `;
-                    pendingListDiv.appendChild(item);
-                });
-            }
-            openModal('adminModal');
-        }
-
-        function approveUser(userId) {
-            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            users = users.map(u => { if (u.id === userId) u.approved = true; return u; });
-            localStorage.setItem('samchiri_users', JSON.stringify(users));
-            alert('승인 완료!');
-            openAdminModal();
-        }
-
-        function rejectUser(userId) {
-            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-            users = users.filter(u => u.id !== userId);
-            localStorage.setItem('samchiri_users', JSON.stringify(users));
-            alert('거절되었습니다.');
-            openAdminModal();
-        }
-    </script>
-
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
+  </script>
 </body>
 </html>
