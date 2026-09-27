@@ -17,26 +17,25 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
             font-family: 'Nanum Pen Script', cursive, sans-serif;
+            padding: 10px;
         }
 
-        /* 칠판 프레임 */
         .blackboard-frame {
             background-color: #1e3328;
-            border: 16px solid #8B4513;
-            border-radius: 8px;
-            width: 90vw;
-            max-width: 1100px;
-            height: 80vh;
-            max-height: 650px;
+            border: 10px solid #8B4513;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 1000px;
+            min-height: 90vh;
             position: relative;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 40px;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .blackboard-frame::before {
@@ -47,89 +46,141 @@
             pointer-events: none;
         }
 
-        /* 상단 영역 */
-        .top-bar {
+        /* 1. 로그인 전 메인 화면 */
+        #homeView {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            z-index: 2;
-        }
-
-        .top-title {
-            font-size: 2.2rem;
-            color: #ffffff;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-        }
-
-        .user-status {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            color: #ffffff;
-            font-size: 1.5rem;
-        }
-
-        .logout-btn {
-            background: transparent;
-            color: #ff9999;
-            border: 2px solid rgba(255, 153, 153, 0.7);
-            padding: 3px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Nanum Pen Script', cursive;
-            font-size: 1.3rem;
-            transition: all 0.2s;
-        }
-        .logout-btn:hover {
-            background-color: rgba(255, 153, 153, 0.1);
-        }
-
-        /* 중앙 메인 콘텐츠 (로그인 전/후 분기) */
-        .main-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             text-align: center;
+            z-index: 1;
             width: 100%;
         }
 
-        .main-title {
-            font-size: 7rem;
-            color: #ffffff;
-            font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.4), 0 0 10px rgba(255,255,255,0.6);
-            letter-spacing: 5px;
+        #homeView h1 {
+            font-size: clamp(4rem, 12vw, 8rem);
+            color: #f7f9f6;
+            font-weight: normal;
+            text-shadow: 0 0 2px rgba(255, 255, 255, 0.8), 2px 2px 5px rgba(0, 0, 0, 0.5);
+            letter-spacing: 8px;
             margin-bottom: 20px;
         }
 
-        /* 메뉴 버튼 스타일 (모임 일정 등) */
-        .menu-container {
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .auth-buttons button {
+            background: transparent;
+            color: #ffffff;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: clamp(1.2rem, 4vw, 1.5rem);
+            border: 2px dashed rgba(255, 255, 255, 0.6);
+            padding: 6px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .auth-buttons button:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-style: solid;
+        }
+
+        /* 2. 로그인 후 대시보드 화면 */
+        #agitView {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            color: #fff;
+        }
+
+        .agit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px dashed rgba(255,255,255,0.4);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .agit-header h2 {
+            font-size: 2rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+
+        .user-info button {
+            background: transparent;
+            color: #ff9999;
+            border: 1px solid #ff9999;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.1rem;
+        }
+
+        .menu-grid {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin-top: 15px;
+            align-items: center;
+            flex: 1;
+            padding: 20px 0;
         }
 
         .menu-card {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            padding: 15px 25px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 1.8rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 255, 255, 0.25);
+            border-radius: 8px;
+            padding: 25px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            cursor: pointer;
             transition: all 0.2s;
-            position: relative;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            text-decoration: none;
+            color: #fff;
+            position: relative; /* 뱃지 위치 기준점 */
         }
 
         .menu-card:hover {
             background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.6);
             transform: translateY(-3px);
         }
 
-        /* 메인 화면 알림 뱃지 */
+        .menu-card .icon {
+            font-size: 2.8rem;
+            margin-bottom: 8px;
+        }
+
+        .menu-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .menu-card p {
+            font-size: 1.2rem;
+            color: #ccc;
+        }
+
+        /* 미투표 알림 뱃지 스타일 */
         .main-badge {
             position: absolute;
             top: -10px;
@@ -137,202 +188,281 @@
             background-color: #d9534f;
             color: white;
             font-size: 1.1rem;
-            padding: 1px 7px;
-            border-radius: 50%;
+            padding: 2px 8px;
+            border-radius: 12px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-        }
-
-        /* 로그인 폼 박스 */
-        .login-box {
-            background: rgba(0, 0, 0, 0.3);
-            border: 2px dashed rgba(255, 255, 255, 0.4);
-            padding: 20px;
-            border-radius: 10px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        .login-box input {
-            padding: 6px 12px;
-            font-size: 1.4rem;
-            font-family: 'Nanum Pen Script', cursive;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            color: #fff;
-            border-radius: 4px;
-            margin-right: 8px;
-            outline: none;
-        }
-        .login-box input::placeholder { color: rgba(255,255,255,0.4); }
-
-        .login-box button {
-            padding: 6px 15px;
-            font-size: 1.4rem;
-            font-family: 'Nanum Pen Script', cursive;
-            background: #a0d8a0;
-            border: none;
-            color: #1e3328;
             font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .login-box button:hover { background: #bcf2bc; }
-
-        /* 우측 하단 떠든 사람 */
-        .troublemakers {
-            position: absolute;
-            bottom: 40px;
-            right: 50px;
-            text-align: right;
-            color: #ffffff;
-            z-index: 2;
         }
 
-        .troublemakers h3 {
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        /* 팝업 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 15px;
         }
 
-        .troublemakers .names {
-            font-size: 1.6rem;
-            color: #e0e0e0;
-            line-height: 1.4;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        .modal-content {
+            background-color: #1e3328;
+            border: 4px solid #8B4513;
+            border-radius: 8px;
+            padding: 25px;
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            color: #fff;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
-        /* 하단 분필 받침대 */
+        .modal-content h2 { font-size: 2rem; margin-bottom: 15px; }
+        .modal-content input {
+            width: 100%; padding: 8px 10px; margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px; color: #fff; font-family: 'Nanum Pen Script', cursive; font-size: 1.3rem; outline: none;
+        }
+        .modal-content input::placeholder { color: rgba(255, 255, 255, 0.5); }
+        .modal-content button.submit-btn {
+            width: 100%; padding: 8px; background-color: #2b3e32; color: #fff;
+            border: 2px solid rgba(255, 255, 255, 0.7); border-radius: 4px;
+            font-family: 'Nanum Pen Script', cursive; font-size: 1.4rem; cursor: pointer;
+        }
+        .close-btn {
+            position: absolute; top: 10px; right: 15px; background: none; border: none;
+            color: #fff; font-size: 1.6rem; cursor: pointer; font-family: sans-serif;
+        }
+
+        .admin-list { text-align: left; margin-top: 15px; }
+        .admin-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.08); padding: 8px 12px; margin-bottom: 8px; border-radius: 4px; font-size: 1.2rem;
+        }
+        .admin-item button { background: #d9534f; color: white; border: none; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-family: 'Nanum Pen Script', cursive; font-size: 1.1rem; }
+        .admin-item button.approve { background: #5cb85c; margin-right: 5px; }
+
         .chalkboard-ledge {
-            position: absolute;
-            bottom: -20px;
-            left: 5%;
-            width: 90%;
-            height: 14px;
-            background-color: #65300e;
-            border-radius: 2px;
-            box-shadow: 0 5px 10px rgba(0,0,0,0.4);
+            position: absolute; bottom: -12px; left: 5%; width: 90%; height: 10px;
+            background-color: #65300e; border-radius: 2px; box-shadow: 0 5px 10px rgba(0,0,0,0.4);
         }
-
-        .chalk {
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 50px;
-            height: 8px;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-        }
-
-        .eraser {
-            position: absolute;
-            top: -16px;
-            right: 100px;
-            width: 60px;
-            height: 16px;
-            background-color: #c29b68;
-            border: 2px solid #8c673b;
-            border-radius: 2px;
-        }
+        .chalk { position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 35px; height: 6px; background-color: #f0f0f0; border-radius: 3px; }
+        .eraser { position: absolute; top: -12px; right: 70px; width: 45px; height: 12px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px; }
     </style>
 </head>
 <body>
 
     <div class="blackboard-frame">
-        <!-- 상단 메뉴 -->
-        <div class="top-bar">
-            <div class="top-title">🏫 삼치리 아지트</div>
-            <div id="userArea"></div>
-        </div>
-
-        <!-- 중앙 타이틀 및 콘텐츠 -->
-        <div class="main-content" id="mainArea">
-            <!-- 동적으로 렌더링됨 -->
-        </div>
-
-        <!-- 우측 하단 떠든 사람 -->
-        <div class="troublemakers">
-            <h3>떠든 사람</h3>
-            <div class="names">
-                김민수<br>
-                박지호<br>
-                이민석
+        
+        <!-- 1. 로그인 전 메인 화면 -->
+        <div id="homeView">
+            <h1>삼치리</h1>
+            <div class="auth-buttons">
+                <button onclick="openModal('loginModal')">로그인</button>
+                <button onclick="openModal('signupModal')">회원가입</button>
+                <button id="adminBtn" style="display:none; border-color: #f0ad4e; color: #f0ad4e;" onclick="openAdminModal()">가입승인관리</button>
             </div>
         </div>
 
-        <!-- 분필 받침대 및 소품 -->
+        <!-- 2. 로그인 후 대시보드 화면 -->
+        <div id="agitView">
+            <div class="agit-header">
+                <h2>삼치리 아지트 🏫</h2>
+                <div class="user-info">
+                    <span id="welcomeMsg"></span>
+                    <button id="agitAdminBtn" style="display:none; color: #f0ad4e; border-color: #f0ad4e;" onclick="openAdminModal()">승인관리</button>
+                    <button onclick="handleLogout()">로그아웃</button>
+                </div>
+            </div>
+            <div class="menu-grid" id="menuGridContainer">
+                <!-- 동적으로 렌더링되어 미투표 뱃지가 포함됨 -->
+            </div>
+        </div>
+
         <div class="chalkboard-ledge">
             <div class="chalk"></div>
             <div class="eraser"></div>
         </div>
     </div>
 
+    <!-- 로그인 팝업 -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+            <h2>로그인</h2>
+            <input type="text" id="loginId" placeholder="아이디">
+            <input type="password" id="loginPw" placeholder="비밀번호">
+            <button class="submit-btn" onclick="handleLogin()">들어가기</button>
+        </div>
+    </div>
+
+    <!-- 회원가입 팝업 -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('signupModal')">&times;</button>
+            <h2>회원가입</h2>
+            <input type="text" id="signupId" placeholder="사용할 아이디">
+            <input type="password" id="signupPw" placeholder="비밀번호">
+            <input type="text" id="signupName" placeholder="이름 (예: 홍길동)">
+            <button class="submit-btn" onclick="handleSignup()">가입 신청하기</button>
+        </div>
+    </div>
+
+    <!-- 관리자 승인 팝업 -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="max-width: 420px;">
+            <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
+            <h2>가입 대기 목록</h2>
+            <div id="pendingList" class="admin-list"></div>
+        </div>
+    </div>
+
     <script>
+        if (!localStorage.getItem('samchiri_users')) {
+            const initialUsers = [
+                { id: 'admin', pw: '1234', name: '관리자(너)', approved: true, isAdmin: true }
+            ];
+            localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
+        }
+
         window.onload = function() {
-            checkLoginState();
+            const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
+            if (loginUser) {
+                showAgitView(loginUser);
+            }
         };
 
-        function checkLoginState() {
-            const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
-            const userArea = document.getElementById('userArea');
-            const mainArea = document.getElementById('mainArea');
+        function openModal(modalId) { document.getElementById(modalId).style.display = 'flex'; }
+        function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
-            if (!loginUser) {
-                userArea.innerHTML = '';
-                mainArea.innerHTML = `
-                    <h1 class="main-title">삼치리</h1>
-                    <div class="login-box">
-                        <input type="text" id="userNameInput" placeholder="이름을 입력하세요 (예: 이홍찬)">
-                        <button onclick="loginUser()">입장하기</button>
-                    </div>
-                `;
+        function handleSignup() {
+            const id = document.getElementById('signupId').value.trim();
+            const pw = document.getElementById('signupPw').value.trim();
+            const name = document.getElementById('signupName').value.trim();
+
+            if (!id || !pw || !name) { alert('모든 칸을 채워주세요!'); return; }
+
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            if (users.some(u => u.id === id)) { alert('이미 존재하는 아이디입니다!'); return; }
+
+            users.push({ id, pw, name, approved: false, isAdmin: false });
+            localStorage.setItem('samchiri_users', JSON.stringify(users));
+            
+            alert('가입 신청 완료! 관리자 승인을 기다려주세요.');
+            closeModal('signupModal');
+            document.getElementById('signupId').value = '';
+            document.getElementById('signupPw').value = '';
+            document.getElementById('signupName').value = '';
+        }
+
+        function handleLogin() {
+            const id = document.getElementById('loginId').value.trim();
+            const pw = document.getElementById('loginPw').value.trim();
+
+            if (!id || !pw) { alert('아이디와 비밀번호를 입력해주세요!'); return; }
+
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            const foundUser = users.find(u => u.id === id && u.pw === pw);
+
+            if (foundUser) {
+                if (!foundUser.approved) { alert('아직 관리자 승인이 안 된 계정입니다!'); return; }
+
+                localStorage.setItem('samchiri_login_user', JSON.stringify(foundUser));
+                closeModal('loginModal');
+                document.getElementById('loginId').value = '';
+                document.getElementById('loginPw').value = '';
+                showAgitView(foundUser);
             } else {
-                userArea.innerHTML = `
-                    <div class="user-status">
-                        <span>${loginUser.name}님 환영해요!</span>
-                        <button class="logout-btn" onclick="logoutUser()">로그아웃</button>
-                    </div>
-                `;
-
-                // 미투표 개수 계산
-                const schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
-                let unvotedCount = schedules.filter(item => {
-                    if (item.type !== 'poll') return false;
-                    let voted = false;
-                    Object.values(item.votes).forEach(arr => {
-                        if (arr.includes(loginUser.name)) voted = true;
-                    });
-                    return !voted;
-                }).length;
-
-                let badgeHtml = unvotedCount > 0 ? `<span class="main-badge">${unvotedCount}</span>` : '';
-
-                mainArea.innerHTML = `
-                    <h1 class="main-title" style="font-size: 5rem; margin-bottom: 10px;">삼치리</h1>
-                    <div class="menu-container">
-                        <a href="schedule.html" class="menu-card">
-                            📅 모임 일정
-                            ${badgeHtml}
-                        </a>
-                    </div>
-                `;
+                alert('아이디나 비밀번호가 틀렸습니다.');
             }
         }
 
-        function loginUser() {
-            const nameInput = document.getElementById('userNameInput').value.trim();
-            if (!nameInput) {
-                alert('이름을 입력해주세요!');
-                return;
-            }
-            const userObj = { name: nameInput };
-            localStorage.setItem('samchiri_login_user', JSON.stringify(userObj));
-            checkLoginState();
-        }
-
-        function logoutUser() {
+        function handleLogout() {
             localStorage.removeItem('samchiri_login_user');
-            checkLoginState();
+            document.getElementById('agitView').style.display = 'none';
+            document.getElementById('homeView').style.display = 'flex';
+        }
+
+        function showAgitView(user) {
+            document.getElementById('homeView').style.display = 'none';
+            document.getElementById('agitView').style.display = 'flex';
+            document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
+
+            if (user.isAdmin) {
+                document.getElementById('adminBtn').style.display = 'block';
+                document.getElementById('agitAdminBtn').style.display = 'block';
+            } else {
+                document.getElementById('adminBtn').style.display = 'none';
+                document.getElementById('agitAdminBtn').style.display = 'none';
+            }
+
+            // 미투표 개수 계산
+            const schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
+            let unvotedCount = schedules.filter(item => {
+                if (item.type !== 'poll') return false;
+                let voted = false;
+                Object.values(item.votes).forEach(arr => {
+                    if (arr.includes(user.name)) voted = true;
+                });
+                return !voted;
+            }).length;
+
+            let badgeHtml = unvotedCount > 0 ? `<span class="main-badge">미투표 ${unvotedCount}</span>` : '';
+
+            // 메뉴 카드 렌더링 (미투표 뱃지 포함)
+            document.getElementById('menuGridContainer').innerHTML = `
+                <a href="schedule.html" class="menu-card">
+                    <div class="icon">📅</div>
+                    <h3>모임 일정</h3>
+                    <p>다음 동창회 언제 하지?</p>
+                    ${badgeHtml}
+                </a>
+            `;
+        }
+
+        function openAdminModal() {
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            const pendingListDiv = document.getElementById('pendingList');
+            pendingListDiv.innerHTML = '';
+
+            const pendingUsers = users.filter(u => !u.approved);
+            if (pendingUsers.length === 0) {
+                pendingListDiv.innerHTML = '<p style="text-align:center; color:#aaa; padding: 20px;">대기 중인 친구가 없습니다.</p>';
+            } else {
+                pendingUsers.forEach(u => {
+                    const item = document.createElement('div');
+                    item.className = 'admin-item';
+                    item.innerHTML = `
+                        <span>${u.name} (${u.id})</span>
+                        <div>
+                            <button class="approve" onclick="approveUser('${u.id}')">승인</button>
+                            <button onclick="rejectUser('${u.id}')">거절</button>
+                        </div>
+                    `;
+                    pendingListDiv.appendChild(item);
+                });
+            }
+            openModal('adminModal');
+        }
+
+        function approveUser(userId) {
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            users = users.map(u => { if (u.id === userId) u.approved = true; return u; });
+            localStorage.setItem('samchiri_users', JSON.stringify(users));
+            alert('승인 완료!');
+            openAdminModal();
+        }
+
+        function rejectUser(userId) {
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            users = users.filter(u => u.id !== userId);
+            localStorage.setItem('samchiri_users', JSON.stringify(users));
+            alert('거절되었습니다.');
+            openAdminModal();
         }
     </script>
 
