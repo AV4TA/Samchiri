@@ -564,7 +564,6 @@
             schedules.push(newEntry);
             localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
             
-            // 성공 알림창 추가!
             alert('일정이 성공적으로 등록되었습니다!');
 
             closeModal('addModal');
@@ -607,9 +606,18 @@
             let item = schedules.find(s => s.id === scheduleId);
             if (!item) return;
 
+            // 이미 투표했는지 검사하는 로직 추가
+            let alreadyVoted = false;
             Object.keys(item.votes).forEach(key => {
-                item.votes[key] = item.votes[key].filter(name => name !== loginUser.name);
+                if (item.votes[key].includes(loginUser.name)) {
+                    alreadyVoted = true;
+                }
             });
+
+            if (alreadyVoted) {
+                alert('이미 투표를 완료하셨습니다!');
+                return;
+            }
 
             item.votes[optIndex].push(loginUser.name);
 
