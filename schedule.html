@@ -174,7 +174,6 @@
             font-weight: bold;
         }
 
-        /* 타임트리 스타일 연속 바 */
         .bar-container {
             display: flex;
             flex-direction: column;
@@ -214,7 +213,6 @@
         .bar-single { border-radius: 4px; }
         .bar-middle { border-radius: 0; }
 
-        /* 모달 스타일 */
         .modal {
             display: none;
             position: fixed;
@@ -428,7 +426,7 @@
                 nextMonthDay++;
             }
 
-            daysData.forEach((dInfo) => {
+            daysData.forEach((dInfo, index) => {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'cal-day' + (dInfo.isOther ? ' other-month' : '') + (dInfo.isToday ? ' today' : '');
                 
@@ -438,14 +436,10 @@
                 barContainer.className = 'bar-container';
 
                 schedules.forEach(item => {
-                    // 일정이 해당 날짜를 포함하고, 혹은 "주말에 걸쳐 연속된 구간의 시작일이거나 해당 주의 첫 날"인 경우에만 바를 그려줌
                     let dDate = new Date(dInfo.dateStr);
-                    let sDate = new Date(item.start);
-                    let eDate = new Date(item.end);
 
                     if (dInfo.dateStr >= item.start && dInfo.dateStr <= item.end) {
-                        // 만약 주말을 넘어가는 경우, 매주 일요일마다 바를 끊어서 각각의 주에 독립된 바가 보이게 처리 (타임트리 방식)
-                        let dayOfWeek = dDate.getDay(); // 0: 일요일
+                        let dayOfWeek = index % 7; 
                         let isStartOfRange = (dInfo.dateStr === item.start);
                         let isFirstDayOfWeek = (dayOfWeek === 0);
 
@@ -454,16 +448,14 @@
                             let typeClass = item.type === 'poll' ? 'poll' : 'event';
                             bar.className = `schedule-bar ${typeClass}`;
 
-                            // 이 주에 끝나는지 확인
                             let currentSunday = new Date(dDate);
                             let daysToSaturday = 6 - dayOfWeek;
                             let currentSaturday = new Date(currentSunday);
-                            currentSaturday.setDate(currentSunday.getDate() + daysToSaturday);
+                            currentSaturday.setDate(currentSaturday.getDate() + daysToSaturday);
                             let saturdayStr = formatDate(currentSaturday);
 
                             let actualEndInThisWeek = item.end < saturdayStr ? item.end : saturdayStr;
                             
-                            // 너비 계산 (며칠 동안 이어지는지)
                             let diffTime = new Date(actualEndInThisWeek) - new Date(dInfo.dateStr);
                             let diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
@@ -571,6 +563,10 @@
 
             schedules.push(newEntry);
             localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
+            
+            // 성공 알림창 추가!
+            alert('일정이 성공적으로 등록되었습니다!');
+
             closeModal('addModal');
             renderCalendar();
         }
@@ -618,6 +614,7 @@
             item.votes[optIndex].push(loginUser.name);
 
             localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
+            alert('투표가 완료되었습니다!');
             openDetailModal(scheduleId);
             renderCalendar();
         }
@@ -627,6 +624,7 @@
                 let schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
                 schedules = schedules.filter(s => s.id !== currentEditingId);
                 localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
+                alert('일정이 삭제되었습니다.');
                 closeModal('detailModal');
                 renderCalendar();
             }
