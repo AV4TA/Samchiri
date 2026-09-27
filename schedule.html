@@ -28,7 +28,6 @@
             border-radius: 8px;
             width: 100%;
             max-width: 1000px;
-            height: auto;
             min-height: 90vh;
             position: relative;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
@@ -46,7 +45,6 @@
             pointer-events: none;
         }
 
-        /* 상단 헤더 */
         .sub-header {
             display: flex;
             justify-content: space-between;
@@ -72,7 +70,6 @@
         }
         .back-btn:hover { background: rgba(255,255,255,0.2); }
 
-        /* 일정 등록 버튼 바 */
         .top-action-bar {
             display: flex;
             justify-content: flex-end;
@@ -96,7 +93,6 @@
             color: #fff;
         }
 
-        /* 달력 프레임 */
         .calendar-container {
             display: flex;
             flex-direction: column;
@@ -146,7 +142,6 @@
             gap: 4px;
         }
 
-        /* 날짜 칸 */
         .cal-day {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -159,7 +154,6 @@
             font-size: 1.1rem;
             min-height: 105px;
             position: relative;
-            transition: all 0.2s;
         }
 
         .cal-day.other-month { color: rgba(255, 255, 255, 0.25); }
@@ -180,11 +174,11 @@
             font-weight: bold;
         }
 
-        /* 타임트리 스타일의 이어지는 가로 바(Bar) */
+        /* 완벽하게 이어지는 연속 바 스타일 */
         .bar-container {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
             width: 100%;
             margin-top: 3px;
             z-index: 2;
@@ -193,7 +187,7 @@
         .schedule-bar {
             height: 22px;
             line-height: 22px;
-            padding: 0 6px;
+            padding: 0 8px;
             font-size: 0.95rem;
             font-weight: bold;
             overflow: hidden;
@@ -206,22 +200,22 @@
         .schedule-bar:hover { filter: brightness(1.15); }
 
         .schedule-bar.event {
-            background: rgba(255, 230, 140, 0.92);
+            background: rgba(255, 230, 140, 0.95);
             color: #2b3e32;
         }
 
         .schedule-bar.poll {
-            background: rgba(140, 210, 255, 0.92);
+            background: rgba(140, 210, 255, 0.95);
             color: #1e3328;
         }
 
-        /* 바 모서리 부드럽게 (시작일/종료일에 따라 다르게) */
-        .bar-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: 2px; }
-        .bar-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-right: 2px; }
-        .bar-middle { border-radius: 0; }
-        .bar-single { border-radius: 4px; margin: 0 2px; }
+        /* 날짜별 바 연결 모양 제어 */
+        .bar-start { border-top-left-radius: 4px; border-bottom-left-radius: 4px; margin-left: 0; width: calc(100% + 4px); }
+        .bar-end { border-top-right-radius: 4px; border-bottom-right-radius: 4px; margin-right: 0; width: calc(100% + 4px); }
+        .bar-middle { border-radius: 0; margin-left: -4px; width: calc(100% + 8px); }
+        .bar-single { border-radius: 4px; width: 100%; }
 
-        /* 팝업 모달 */
+        /* 모달 스타일 */
         .modal {
             display: none;
             position: fixed;
@@ -335,7 +329,6 @@
         </div>
     </div>
 
-    <!-- 일정/투표 추가 모달 -->
     <div id="addModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('addModal')">&times;</button>
@@ -365,7 +358,6 @@
         </div>
     </div>
 
-    <!-- 투표 참여 및 상세 확인 모달 -->
     <div id="detailModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
@@ -413,23 +405,19 @@
             const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
             const todayDate = today.getDate();
 
-            // 날짜 칸들을 미리 배열로 생성
             let daysData = [];
 
-            // 지난달 빈 칸
             for (let i = firstDayIndex; i > 0; i--) {
                 let d = new Date(year, month, 1);
                 d.setDate(d.getDate() - i);
                 daysData.push({ dateStr: formatDate(d), dayNum: d.getDate(), isOther: true });
             }
 
-            // 이번달 날짜
             for (let i = 1; i <= lastDay; i++) {
                 let dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 daysData.push({ dateStr: dateStr, dayNum: i, isOther: false, isToday: (isCurrentMonth && i === todayDate) });
             }
 
-            // 다음달 빈 칸으로 7주 단위 맞추기
             let totalCells = Math.ceil(daysData.length / 7) * 7;
             let nextMonthDay = 1;
             while (daysData.length < totalCells) {
@@ -441,14 +429,12 @@
                 nextMonthDay++;
             }
 
-            // 화면에 렌더링
-            daysData.forEach(dInfo => {
+            daysData.forEach((dInfo, index) => {
                 const dayDiv = document.createElement('div');
                 dayDiv.className = 'cal-day' + (dInfo.isOther ? ' other-month' : '') + (dInfo.isToday ? ' today' : '');
                 
                 dayDiv.innerHTML = `<span class="day-num">${dInfo.dayNum}</span>`;
 
-                // 해당 날짜에 걸치는 일정들을 바 형태로 표시하기 위한 컨테이너
                 const barContainer = document.createElement('div');
                 barContainer.className = 'bar-container';
 
@@ -458,12 +444,17 @@
                         let typeClass = item.type === 'poll' ? 'poll' : 'event';
                         bar.className = `schedule-bar ${typeClass}`;
 
-                        // 시작일, 종료일, 중간일에 따라 모서리 모양 다르게 부여
-                        if (dInfo.dateStr === item.start && dInfo.dateStr === item.end) {
+                        let dayOfWeek = index % 7; // 0: 일요일, 6: 토요일
+                        let isStart = (dInfo.dateStr === item.start);
+                        let isEnd = (dInfo.dateStr === item.end);
+                        let isSaturday = (dayOfWeek === 6);
+                        let isSunday = (dayOfWeek === 0);
+
+                        if (isStart && isEnd) {
                             bar.classList.add('bar-single');
-                        } else if (dInfo.dateStr === item.start) {
+                        } else if (isStart || isSunday) {
                             bar.classList.add('bar-start');
-                        } else if (dInfo.dateStr === item.end) {
+                        } else if (isEnd || isSaturday) {
                             bar.classList.add('bar-end');
                         } else {
                             bar.classList.add('bar-middle');
