@@ -130,21 +130,19 @@
             font-size: 1.1rem;
         }
 
-        /* 메뉴 카드 그리드 (보낸 스크린샷 스타일 반영) */
+        /* 메뉴 카드 그리드 (모임 일정 페이지만 남김) */
         .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             flex: 1;
-            overflow-y: auto;
-            padding: 5px;
         }
 
         .menu-card {
             background: rgba(255, 255, 255, 0.08);
             border: 2px solid rgba(255, 255, 255, 0.25);
             border-radius: 8px;
-            padding: 20px;
+            padding: 30px 50px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -152,6 +150,8 @@
             text-align: center;
             cursor: pointer;
             transition: all 0.2s;
+            text-decoration: none;
+            color: #fff;
         }
 
         .menu-card:hover {
@@ -161,62 +161,19 @@
         }
 
         .menu-card .icon {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
+            font-size: 3rem;
+            margin-bottom: 10px;
         }
 
         .menu-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 4px;
+            font-size: 2rem;
+            margin-bottom: 5px;
             color: #fff;
         }
 
         .menu-card p {
-            font-size: 1.2rem;
-            color: #ccc;
-        }
-
-        /* 3. 각 메뉴별 상세 페이지 영역 */
-        .sub-page {
-            display: none;
-            flex-direction: column;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            color: #fff;
-        }
-
-        .sub-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px dashed rgba(255,255,255,0.4);
-            padding-bottom: 12px;
-            margin-bottom: 15px;
-        }
-
-        .sub-header h2 { font-size: 2.2rem; }
-        .back-btn {
-            background: transparent;
-            color: #fff;
-            border: 1px solid #fff;
-            padding: 3px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: 'Nanum Pen Script', cursive;
             font-size: 1.3rem;
-        }
-
-        .sub-content-box {
-            flex: 1;
-            background: rgba(0,0,0,0.15);
-            border-radius: 6px;
-            padding: 20px;
-            border: 1px solid rgba(255,255,255,0.2);
-            overflow-y: auto;
-            font-size: 1.4rem;
-            text-align: center;
-            color: #ddd;
+            color: #ccc;
         }
 
         /* 팝업 모달 */
@@ -292,7 +249,7 @@
             </div>
         </div>
 
-        <!-- 2. 로그인 후 대시보드 (메뉴 선택 페이지) -->
+        <!-- 2. 로그인 후 대시보드 화면 (모임 일정 페이지만 남김) -->
         <div id="agitView">
             <div class="agit-header">
                 <h2>삼치리 아지트 🏫</h2>
@@ -303,70 +260,12 @@
                 </div>
             </div>
             <div class="menu-grid">
-                <div class="menu-card" onclick="openSubPage('boardPage')">
-                    <div class="icon">📋</div>
-                    <h3>자유게시판</h3>
-                    <p>친구들과 수다 떨기</p>
-                </div>
-                <div class="menu-card" onclick="openSubPage('galleryPage')">
-                    <div class="icon">📷</div>
-                    <h3>추억 사진첩</h3>
-                    <p>우리들의 옛날 사진 모음</p>
-                </div>
-                <div class="menu-card" onclick="openSubPage('calendarPage')">
+                <!-- 별도의 파일로 만들 schedule.html로 연결 -->
+                <a href="schedule.html" class="menu-card">
                     <div class="icon">📅</div>
                     <h3>모임 일정</h3>
                     <p>다음 동창회 언제 하지?</p>
-                </div>
-                <div class="menu-card" onclick="openSubPage('profilePage')">
-                    <div class="icon">👥</div>
-                    <h3>동창 명부</h3>
-                    <p>평고 63회 친구들 찾기</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. 각 서브 페이지들 (자유게시판) -->
-        <div id="boardPage" class="sub-page">
-            <div class="sub-header">
-                <h2>📋 자유게시판</h2>
-                <button class="back-btn" onclick="goBackToAgit()">돌아가기</button>
-            </div>
-            <div class="sub-content-box">
-                <p>자유게시판 컨텐츠가 들어갈 자리입니다. (다음 단계에서 게시글 작성 기능을 붙여드릴게요!)</p>
-            </div>
-        </div>
-
-        <!-- 추억 사진첩 페이지 -->
-        <div id="galleryPage" class="sub-page">
-            <div class="sub-header">
-                <h2>📷 추억 사진첩</h2>
-                <button class="back-btn" onclick="goBackToAgit()">돌아가기</button>
-            </div>
-            <div class="sub-content-box">
-                <p>사진첩 공간입니다. 졸업앨범 사진이나 모임 사진을 올려보세요!</p>
-            </div>
-        </div>
-
-        <!-- 모임 일정 페이지 -->
-        <div id="calendarPage" class="sub-page">
-            <div class="sub-header">
-                <h2>📅 모임 일정</h2>
-                <button class="back-btn" onclick="goBackToAgit()">돌아가기</button>
-            </div>
-            <div class="sub-content-box">
-                <p>다가오는 동창회 및 모임 일정을 공유하는 캘린더 공간입니다.</p>
-            </div>
-        </div>
-
-        <!-- 동창 명부 페이지 -->
-        <div id="profilePage" class="sub-page">
-            <div class="sub-header">
-                <h2>👥 동창 명부</h2>
-                <button class="back-btn" onclick="goBackToAgit()">돌아가기</button>
-            </div>
-            <div class="sub-content-box">
-                <p>평택고 63회 친구들의 명단과 프로필을 모아두는 공간입니다.</p>
+                </a>
             </div>
         </div>
 
@@ -470,21 +369,12 @@
 
         function handleLogout() {
             localStorage.removeItem('samchiri_login_user');
-            hideAllViews();
+            document.getElementById('agitView').style.display = 'none';
             document.getElementById('homeView').style.display = 'flex';
         }
 
-        function hideAllViews() {
-            document.getElementById('homeView').style.display = 'none';
-            document.getElementById('agitView').style.display = 'none';
-            document.getElementById('boardPage').style.display = 'none';
-            document.getElementById('galleryPage').style.display = 'none';
-            document.getElementById('calendarPage').style.display = 'none';
-            document.getElementById('profilePage').style.display = 'none';
-        }
-
         function showAgitView(user) {
-            hideAllViews();
+            document.getElementById('homeView').style.display = 'none';
             document.getElementById('agitView').style.display = 'flex';
             document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
 
@@ -497,19 +387,6 @@
             }
         }
 
-        // 서브 페이지 이동 함수
-        function openSubPage(pageId) {
-            hideAllViews();
-            document.getElementById(pageId).style.display = 'flex';
-        }
-
-        // 대시보드로 돌아가기
-        function goBackToAgit() {
-            const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
-            showAgitView(loginUser);
-        }
-
-        // 관리자 모달
         function openAdminModal() {
             let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
             const pendingListDiv = document.getElementById('pendingList');
