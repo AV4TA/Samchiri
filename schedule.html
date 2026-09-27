@@ -28,8 +28,8 @@
             border-radius: 6px;
             width: 94vw;
             max-width: 1000px;
-            height: 88vh;
-            max-height: 680px;
+            height: 90vh;
+            max-height: 720px;
             position: relative;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
             display: flex;
@@ -46,6 +46,7 @@
             pointer-events: none;
         }
 
+        /* 상단 헤더 */
         .sub-header {
             display: flex;
             justify-content: space-between;
@@ -56,7 +57,7 @@
             z-index: 1;
         }
 
-        .sub-header h2 { font-size: 2.5rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .sub-header h2 { font-size: 2.3rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
         
         .back-btn {
             background: transparent;
@@ -70,21 +71,100 @@
             text-decoration: none;
         }
 
-        .back-btn:hover {
-            background: rgba(255,255,255,0.1);
-        }
+        .back-btn:hover { background: rgba(255,255,255,0.1); }
 
-        .sub-content-box {
+        /* 타임트리 스타일 달력 컨테이너 */
+        .calendar-container {
             flex: 1;
+            display: flex;
+            flex-direction: column;
             background: rgba(0,0,0,0.15);
             border-radius: 6px;
-            padding: 20px;
+            padding: 15px;
             border: 1px solid rgba(255,255,255,0.2);
-            overflow-y: auto;
-            font-size: 1.5rem;
             z-index: 1;
+            overflow: hidden;
         }
 
+        .cal-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+
+        .cal-nav button {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.5);
+            color: #fff;
+            padding: 2px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.5rem;
+        }
+
+        .cal-nav button:hover { background: rgba(255,255,255,0.1); }
+
+        /* 요일 헤더 */
+        .cal-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #a0d8a0;
+        }
+
+        .cal-weekdays div:first-child { color: #ff9999; } /* 일요일 빨간색 */
+        .cal-weekdays div:last-child { color: #99ccff; }  /* 토요일 파란색 */
+
+        /* 날짜 그리드 */
+        .cal-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-template-rows: repeat(5, 1fr);
+            flex: 1;
+            gap: 5px;
+        }
+
+        .cal-day {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: flex-start;
+            font-size: 1.3rem;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .cal-day:hover { background: rgba(255, 255, 255, 0.12); }
+
+        .cal-day.other-month { color: rgba(255, 255, 255, 0.3); }
+
+        /* 타임트리처럼 일정 카드가 날짜 칸 안에 쏙 들어가는 스타일 */
+        .cal-event {
+            background: rgba(255, 235, 150, 0.85);
+            color: #2b3e32;
+            font-size: 1.1rem;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-top: 3px;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-weight: bold;
+        }
+
+        /* 하단 분필 받침대 */
         .chalkboard-ledge {
             position: absolute; bottom: -15px; left: 5%; width: 90%; height: 12px;
             background-color: #65300e; border-radius: 2px; box-shadow: 0 5px 10px rgba(0,0,0,0.4);
@@ -98,11 +178,22 @@
     <div class="blackboard-frame">
         <div class="sub-header">
             <h2>📅 모임 일정</h2>
-            <!-- 메인 아지트 화면으로 돌아가는 버튼 -->
             <a href="index.html" class="back-btn">돌아가기</a>
         </div>
-        <div class="sub-content-box">
-            <p>여기는 평고 63회 친구들의 다가오는 모임 일정을 공유하는 공간입니다. 일정 등록 기능도 나중에 추가해 드릴게요!</p>
+
+        <!-- 타임트리 스타일 달력 영역 -->
+        <div class="calendar-container">
+            <div class="cal-nav">
+                <button onclick="changeMonth(-1)">◀ 이전</button>
+                <span id="calMonthTitle">2026년 9월</span>
+                <button onclick="changeMonth(1)">다음 ▶</button>
+            </div>
+            <div class="cal-weekdays">
+                <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+            </div>
+            <div id="calGrid" class="cal-grid">
+                <!-- 자바스크립트로 날짜가 동적으로 채워짐 -->
+            </div>
         </div>
 
         <div class="chalkboard-ledge">
@@ -110,6 +201,74 @@
             <div class="eraser"></div>
         </div>
     </div>
+
+    <script>
+        window.onload = function() {
+            const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
+            if (!loginUser) {
+                alert('로그인이 필요한 페이지입니다!');
+                window.location.href = 'index.html';
+                return;
+            }
+            renderCalendar();
+        };
+
+        let currentDate = new Date();
+
+        // 샘플 일정 데이터 (나중에 친구들이 직접 등록할 수 있게 확장 가능)
+        const sampleEvents = {
+            "2026-09-30": "추석 연휴 모임 🍻",
+            "2026-10-15": "평고 63회 정기 동창회",
+            "2026-10-25": "김민수 생일 🎂"
+        };
+
+        function renderCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+
+            document.getElementById('calMonthTitleinnerText', document.getElementById('calMonthTitle').innerText = `${year}년 ${month + 1}월`);
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const prevLastDay = new Date(year, month, 0).getDate();
+
+            const grid = document.getElementById('calGrid');
+            grid.innerHTML = '';
+
+            // 지난달 빈 칸 채우기
+            for (let i = firstDayIndex; i > 0; i--) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'cal-day other-month';
+                dayDiv.innerText = prevLastDay - i + 1;
+                grid.appendChild(dayDiv);
+            }
+
+            // 이번달 날짜 채우기
+            for (let i = 1; i <= lastDay; i++) {
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'cal-day';
+                
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                
+                dayDiv.innerHTML = `<span>${i}</span>`;
+
+                // 일정이 있으면 타임트리 스타일 카드로 표시
+                if (sampleEvents[dateStr]) {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'cal-event';
+                    eventDiv.innerText = sampleEvents[dateStr];
+                    dayDiv.appendChild(eventDiv);
+                }
+
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function changeMonth(direction) {
+            currentDate.setMonth(currentDate.getMonth() + direction);
+            renderCalendar();
+        }
+    </script>
 
 </body>
 </html>
