@@ -16,27 +16,27 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             overflow: hidden;
             font-family: 'Nanum Pen Script', 'Comic Sans MS', cursive, sans-serif;
         }
 
-        /* 칠판 프레임 */
+        /* 칠판 프레임 (모바일에서도 여백 있게 꽉 차도록 수정) */
         .blackboard-frame {
             background-color: #1e3328;
-            border: 16px solid #8B4513;
-            border-radius: 8px;
-            width: 90vw;
-            max-width: 1100px;
-            height: 80vh;
-            max-height: 650px;
+            border: 12px solid #8B4513;
+            border-radius: 6px;
+            width: 94vw;
+            max-width: 1000px;
+            height: 85vh;
+            max-height: 600px;
             position: relative;
             box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 50px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 40px;
+            padding: 20px;
         }
 
         /* 칠판 가루 질감 오버레이 */
@@ -48,36 +48,64 @@
             pointer-events: none;
         }
 
-        /* 중앙 컨테이너 (제목 + 버튼을 함께 묶음) */
+        /* 중앙 컨테이너 */
         .center-content {
             display: flex;
             flex-direction: column;
             align-items: center;
             text-align: center;
             z-index: 1;
+            width: 100%;
         }
 
+        /* 분필로 글씨가 써지는 듯한 애니메이션 효과 */
         .center-content h1 {
-            font-size: 8rem;
+            font-size: clamp(4rem, 12vw, 8rem); /* 모바일에서는 자동 축소, PC에서는 크게 */
             color: #ffffff;
             font-weight: 700;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.4), 0 0 10px rgba(255,255,255,0.6);
-            letter-spacing: 5px;
-            margin-bottom: 20px;
+            letter-spacing: 4px;
+            margin-bottom: 25px;
+            white-space: nowrap; /* 글자가 절대 밑으로 떨어지지 않게 고정 */
+            
+            /* 판서 애니메이션 적용 */
+            overflow: hidden;
+            border-right: 4px solid rgba(255, 255, 255, 0.7); /* 분필 효과선 */
+            width: 0;
+            animation: typing 1.5s steps(4, end) forwards, blink-caret 0.75s step-end infinite;
         }
 
-        /* 삼치리 밑으로 이동한 로그인/회원가입 버튼 */
+        /* 타이핑(판서) 되는 과정 애니메이션 */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        /* 분필 깜빡이는 커서 효과 */
+        @keyframes blink-caret {
+            from, to { border-color: transparent; }
+            50% { border-color: rgba(255, 255, 255, 0.7); }
+        }
+
+        /* 로그인/회원가입 버튼 (애니메이션 끝난 뒤 서서히 나타남) */
         .auth-buttons {
             display: flex;
-            gap: 20px;
+            gap: 15px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in-out 1.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .auth-buttons a {
             color: #ffffff;
             text-decoration: none;
-            font-size: 1.5rem;
+            font-size: clamp(1.1rem, 4vw, 1.4rem);
             border: 2px solid rgba(255, 255, 255, 0.7);
-            padding: 6px 20px;
+            padding: 5px 18px;
             border-radius: 4px;
             transition: all 0.2s;
         }
@@ -89,10 +117,10 @@
         /* 하단 분필 받침대 */
         .chalkboard-ledge {
             position: absolute;
-            bottom: -20px;
+            bottom: -15px;
             left: 5%;
             width: 90%;
-            height: 14px;
+            height: 12px;
             background-color: #65300e;
             border-radius: 2px;
             box-shadow: 0 5px 10px rgba(0,0,0,0.4);
@@ -100,33 +128,30 @@
 
         .chalk {
             position: absolute;
-            top: -8px;
+            top: -7px;
             left: 50%;
             transform: translateX(-50%);
-            width: 50px;
-            height: 8px;
+            width: 40px;
+            height: 7px;
             background-color: #f0f0f0;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            border-radius: 3px;
         }
 
         .eraser {
             position: absolute;
-            top: -16px;
-            right: 100px;
-            width: 60px;
-            height: 16px;
+            top: -14px;
+            right: 80px;
+            width: 50px;
+            height: 14px;
             background-color: #c29b68;
             border: 2px solid #8c673b;
             border-radius: 2px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
     </style>
 </head>
 <body>
 
     <div class="blackboard-frame">
-        <!-- 중앙 정렬된 타이틀과 로그인/회원가입 버튼 -->
         <div class="center-content">
             <h1>삼치리</h1>
             <div class="auth-buttons">
@@ -135,7 +160,6 @@
             </div>
         </div>
 
-        <!-- 분필 받침대 및 소품 -->
         <div class="chalkboard-ledge">
             <div class="chalk"></div>
             <div class="eraser"></div>
