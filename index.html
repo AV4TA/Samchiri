@@ -47,22 +47,22 @@
       pointer-events: none;
     }
 
-    /* 우측 상단 메뉴 버튼 그룹 */
+    /* 우측 상단 메뉴 버튼 그룹 (겹침 방지를 위해 너비 확보 및 위치 조정) */
     .top-right-menu {
       position: absolute;
       top: 20px;
       right: 20px;
       display: flex;
-      gap: 8px;
+      gap: 6px;
       z-index: 5;
     }
 
     .top-right-menu button {
       background: transparent;
       color: #ffffff;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       border: 2px dashed rgba(255, 255, 255, 0.6);
-      padding: 3px 10px;
+      padding: 3px 8px;
       border-radius: 6px;
       cursor: pointer;
       font-family: 'Nanum Pen Script', cursive;
@@ -126,25 +126,23 @@
 
     .agit-header {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      flex-direction: column;
+      align-items: flex-start;
       border-bottom: 2px dashed rgba(255,255,255,0.4);
       padding-bottom: 15px;
       margin-bottom: 25px;
-      flex-wrap: wrap;
-      gap: 10px;
+      padding-right: 120px; /* 우측 버튼 영역과 겹치지 않게 여백 확보 */
+      gap: 5px;
     }
 
     .agit-header h2 {
-      font-size: 2rem;
+      font-size: 1.8rem;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .agit-header .welcome-text {
       font-size: 1.3rem;
+      color: #f0ad4e;
     }
 
     .menu-grid {
@@ -268,13 +266,8 @@
     <!-- 2. 로그인 후 아지트 대시보드 화면 -->
     <div id="agitView">
       <div class="agit-header">
-        <h2 style="display:flex; align-items:center; gap:8px;">
-          삼치리 아지트 
-          <span style="font-size: 1.5rem; font-weight: normal; color: #f0ad4e;" id="welcomeMsg"></span>
-        </h2>
-        <div class="user-info">
-          <button onclick="handleLogout()" style="background:transparent; color:#ff9999; border:1px solid #ff9999; padding:2px 8px; border-radius:4px; font-family:'Nanum Pen Script'; font-size:1.2rem; cursor:pointer;">로그아웃</button>
-        </div>
+        <h2>삼치리 아지트 🏫</h2>
+        <span class="welcome-text" id="welcomeMsg"></span>
       </div>
 
       <div class="menu-grid">
@@ -397,12 +390,14 @@
     function showAgitView(user) {
       document.getElementById('homeView').style.display = 'none';
       document.getElementById('agitView').style.display = 'flex';
-      document.getElementById('welcomeMsg').innerText = `(${user.name}님 환영해요!)`;
+      document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
 
       let menuHtml = '';
       if (user.isAdmin) {
         menuHtml += `<button onclick="openAdminModal()" style="color: #f0ad4e; border-color: #f0ad4e;">승인관리</button>`;
       }
+      menuHtml += `<button onclick="handleLogout()" style="color: #ff9999; border-color: #ff9999;">로그아웃</button>`;
+      
       document.getElementById('topRightMenu').innerHTML = menuHtml;
     }
 
