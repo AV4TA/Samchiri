@@ -88,7 +88,7 @@
             border-style: solid;
         }
 
-        /* 2. 로그인 후 대시보드 아지트 화면 */
+        /* 2. 로그인 후 대시보드 화면 */
         #agitView {
             display: none;
             flex-direction: column;
@@ -130,7 +130,6 @@
             font-size: 1.1rem;
         }
 
-        /* 메뉴 카드 그리드 (모임 일정 페이지만 남김) */
         .menu-grid {
             display: flex;
             justify-content: center;
@@ -249,7 +248,7 @@
             </div>
         </div>
 
-        <!-- 2. 로그인 후 대시보드 화면 (모임 일정 페이지만 남김) -->
+        <!-- 2. 로그인 후 대시보드 화면 -->
         <div id="agitView">
             <div class="agit-header">
                 <h2>삼치리 아지트 🏫</h2>
@@ -260,7 +259,6 @@
                 </div>
             </div>
             <div class="menu-grid">
-                <!-- 별도의 파일로 만들 schedule.html로 연결 -->
                 <a href="schedule.html" class="menu-card">
                     <div class="icon">📅</div>
                     <h3>모임 일정</h3>
@@ -315,6 +313,7 @@
             localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
         }
 
+        // 페이지가 켜질 때 자동 로그인 체크 (저장된 로그인 정보가 있으면 바로 아지트 화면으로 진입)
         window.onload = function() {
             const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
             if (loginUser) {
@@ -357,6 +356,7 @@
             if (foundUser) {
                 if (!foundUser.approved) { alert('아직 관리자 승인이 안 된 계정입니다!'); return; }
 
+                // 로그인 정보를 저장하여 브라우저를 껐다 켜도 유지되도록 함
                 localStorage.setItem('samchiri_login_user', JSON.stringify(foundUser));
                 closeModal('loginModal');
                 document.getElementById('loginId').value = '';
@@ -367,6 +367,7 @@
             }
         }
 
+        // 로그아웃 시 저장된 자동 로그인 정보도 함께 삭제
         function handleLogout() {
             localStorage.removeItem('samchiri_login_user');
             document.getElementById('agitView').style.display = 'none';
