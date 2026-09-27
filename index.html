@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <!-- PWA 매니페스트 연결 -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1e3328">
+
+<!-- 서비스 워커 등록 스크립트 -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => { console.log('Service Worker 등록 성공!', reg); })
+        .catch((err) => { console.log('Service Worker 등록 실패:', err); });
+    });
+  }
+</script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>삼치리 - 평택고등학교 63회</title>
