@@ -591,7 +591,7 @@
                         <div class="poll-item-box">
                             <div><b>${opt}</b> (${voters.length}표)</div>
                             <div style="font-size:1rem; color:#ccc; margin:2px 0;">참여자: ${voters.length > 0 ? voters.join(', ') : '없음'}</div>
-                            <button class="poll-btn" onclick="castVote(${item.id}, ${idx})">이 선택지에 투표하기 👍</button>
+                            <button class="poll-btn" onclick="castVote(${item.id}, ${idx})">이 선택지로 투표/수정하기 👍</button>
                         </div>
                     `;
                 });
@@ -606,23 +606,36 @@
             let item = schedules.find(s => s.id === scheduleId);
             if (!item) return;
 
-            // 이미 투표했는지 검사하는 로직 추가
-            let alreadyVoted = false;
+            // 기존에 어디에 투표했었는지 확인
+            let previouslyVotedOpt = -1;
             Object.keys(item.votes).forEach(key => {
                 if (item.votes[key].includes(loginUser.name)) {
-                    alreadyVoted = true;
+                    previouslyVotedOpt = parseInt(key);
                 }
             });
 
-            if (alreadyVoted) {
-                alert('이미 투표를 완료하셨습니다!');
+            // 이미 같은 곳에 투표한 경우
+            if (previouslyVotedOpt === optIndex) {
+                alert('이미 이 선택지에 투표하셨습니다!');
                 return;
             }
 
+            // 기존 투표 기록 전체 제거 (어디에 있든)
+            Object.keys(item.votes).forEach(key => {
+                item.votes[key] = item.votes[key].filter(name => name !== loginUser.name);
+            });
+
+            // 새로운 선택지에 추가
             item.votes[optIndex].push(loginUser.name);
 
             localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
-            alert('투표가 완료되었습니다!');
+            
+            if (previouslyVotedOpt !== -1) {
+                alert('투표 내용이 수정되었습니다!');
+            } else {
+                alert('투표가 완료되었습니다!');
+            }
+
             openDetailModal(scheduleId);
             renderCalendar();
         }
