@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>삼치리 - 평택고등학교 63회</title>
-    <!-- 예쁜 분필/손글씨 폰트 불러오기 -->
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Pen+Script&display=swap" rel="stylesheet">
     <style>
         * {
@@ -23,7 +22,6 @@
             font-family: 'Nanum Pen Script', cursive, sans-serif;
         }
 
-        /* 칠판 프레임 */
         .blackboard-frame {
             background-color: #1e3328;
             border: 12px solid #8B4513;
@@ -41,7 +39,6 @@
             padding: 20px;
         }
 
-        /* 칠판 가루 질감 오버레이 */
         .blackboard-frame::before {
             content: "";
             position: absolute;
@@ -50,7 +47,6 @@
             pointer-events: none;
         }
 
-        /* 중앙 컨테이너 */
         .center-content {
             display: flex;
             flex-direction: column;
@@ -60,7 +56,6 @@
             width: 100%;
         }
 
-        /* 판서 애니메이션 */
         .center-content h1 {
             font-size: clamp(5rem, 15vw, 9rem);
             color: #f7f9f6;
@@ -72,27 +67,11 @@
             letter-spacing: 8px;
             margin-bottom: 25px;
             white-space: nowrap;
-            opacity: 0;
-            transform: scale(0.95);
-            animation: chalkDraw 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
         }
 
-        @keyframes chalkDraw {
-            0% { opacity: 0; transform: scale(0.9) translateY(10px); filter: blur(4px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0px); }
-        }
-
-        /* 버튼 영역 */
         .auth-buttons {
             display: flex;
             gap: 15px;
-            opacity: 0;
-            animation: fadeIn 0.8s ease-in-out 0.8s forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .auth-buttons button {
@@ -113,7 +92,7 @@
             border-style: solid;
         }
 
-        /* 팝업 모달창 공통 스타일 */
+        /* 팝업 모달 */
         .modal {
             display: none;
             position: fixed;
@@ -130,11 +109,13 @@
             border-radius: 8px;
             padding: 30px;
             width: 90%;
-            max-width: 380px;
+            max-width: 420px;
             text-align: center;
             position: relative;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             color: #fff;
+            max-height: 80vh;
+            overflow-y: auto;
         }
 
         .modal-content h2 {
@@ -171,11 +152,6 @@
             font-size: 1.5rem;
             cursor: pointer;
             margin-top: 5px;
-            transition: background 0.2s;
-        }
-
-        .modal-content button.submit-btn:hover {
-            background-color: rgba(255, 255, 255, 0.2);
         }
 
         .close-btn {
@@ -190,11 +166,40 @@
             font-family: sans-serif;
         }
 
-        /* 하단 분필 받침대 */
+        /* 관리자 대기 목록 스타일 */
+        .admin-list {
+            text-align: left;
+            margin-top: 15px;
+        }
+        .admin-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.08);
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 1.3rem;
+        }
+        .admin-item button {
+            background: #d9534f;
+            color: white;
+            border: none;
+            padding: 3px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.2rem;
+        }
+        .admin-item button.approve {
+            background: #5cb85c;
+            margin-right: 5px;
+        }
+
         .chalkboard-ledge {
             position: absolute;
             bottom: -15px;
-            left: 5%;
+            left: 5%5%;
             width: 90%;
             height: 12px;
             background-color: #65300e;
@@ -203,25 +208,11 @@
         }
 
         .chalk {
-            position: absolute;
-            top: -7px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 7px;
-            background-color: #f0f0f0;
-            border-radius: 3px;
+            position: absolute; top: -7px; left: 50%; transform: translateX(-50%); width: 40px; height: 7px; background-color: #f0f0f0; border-radius: 3px;
         }
 
         .eraser {
-            position: absolute;
-            top: -14px;
-            right: 80px;
-            width: 50px;
-            height: 14px;
-            background-color: #c29b68;
-            border: 2px solid #8c673b;
-            border-radius: 2px;
+            position: absolute; top: -14px; right: 80px; width: 50px; height: 14px; background-color: #c29b68; border: 2px solid #8c673b; border-radius: 2px;
         }
     </style>
 </head>
@@ -233,6 +224,7 @@
             <div class="auth-buttons">
                 <button onclick="openModal('loginModal')">로그인</button>
                 <button onclick="openModal('signupModal')">회원가입</button>
+                <button id="adminBtn" style="display:none; border-color: #f0ad4e; color: #f0ad4e;" onclick="openAdminModal()">가입승인관리</button>
             </div>
         </div>
 
@@ -242,7 +234,7 @@
         </div>
     </div>
 
-    <!-- 로그인 팝업 창 -->
+    <!-- 로그인 팝업 -->
     <div id="loginModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
@@ -253,53 +245,69 @@
         </div>
     </div>
 
-    <!-- 회원가입 팝업 창 -->
+    <!-- 회원가입 팝업 -->
     <div id="signupModal" class="modal">
         <div class="modal-content">
             <button class="close-btn" onclick="closeModal('signupModal')">&times;</button>
             <h2>회원가입</h2>
             <input type="text" id="signupId" placeholder="사용할 아이디">
             <input type="password" id="signupPw" placeholder="비밀번호">
-            <input type="text" id="signupName" placeholder="이름 (예: 평고 63회 김민수)">
-            <button class="submit-btn" onclick="handleSignup()">가입하기</button>
+            <input type="text" id="signupName" placeholder="이름 (예: 홍길동)">
+            <button class="submit-btn" onclick="handleSignup()">가입 신청하기</button>
+        </div>
+    </div>
+
+    <!-- 관리자 승인 팝업 -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content" style="max-width: 480px;">
+            <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
+            <h2>가입 대기 목록</h2>
+            <div id="pendingList" class="admin-list">
+                <!-- 대기 중인 친구들이 여기에 동적으로 표시됨 -->
+            </div>
         </div>
     </div>
 
     <script>
-        // 팝업 열기
+        // 초기 관리자 계정 생성 (최초 접속 시 자동 생성: 아이디 admin / 비번 1234)
+        if (!localStorage.getItem('samchiri_users')) {
+            const initialUsers = [
+                { id: 'admin', pw: '1234', name: '관리자(너)', approved: true, isAdmin: true }
+            ];
+            localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
+        }
+
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
         }
 
-        // 팝업 닫기
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
 
-        // 회원가입 처리 (브라우저 저장소 사용)
+        // 회원가입 신청
         function handleSignup() {
             const id = document.getElementById('signupId').value.trim();
             const pw = document.getElementById('signupPw').value.trim();
             const name = document.getElementById('signupName').value.trim();
 
             if (!id || !pw || !name) {
-                alert('모든 칸을 빈틈없이 채워주세요!');
+                alert('모든 칸을 채워주세요!');
                 return;
             }
 
-            // 기존 회원 목록 가져오기 또는 빈 배열 생성
             let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
             
-            // 아이디 중복 체크
             if (users.some(user => user.id === id)) {
                 alert('이미 존재하는 아이디입니다!');
                 return;
             }
 
-            users.push({ id, pw, name });
+            // approved: false (관리자 승인 대기 상태)
+            users.push({ id, pw, name, approved: false, isAdmin: false });
             localStorage.setItem('samchiri_users', JSON.stringify(users));
             
-            alert('삼치리 식구(+1)가 되신 걸 환영합니다! 로그인해 주세요.');
+            alert('가입 신청이 완료되었습니다! 관리자(너)가 승인하면 로그인할 수 있어요.');
             closeModal('signupModal');
             document.getElementById('signupId').value = '';
             document.getElementById('signupPw').value = '';
@@ -320,13 +328,71 @@
             const foundUser = users.find(user => user.id === id && user.pw === pw);
 
             if (foundUser) {
-                alert(`반가워요, ${foundUser.name}님! 오늘도 삼치리에서 즐거운 시간 보내세요.`);
+                if (!foundUser.approved) {
+                    alert('아직 관리자 승인이 완료되지 않은 계정입니다!');
+                    return;
+                }
+
+                alert(`반가워요, ${foundUser.name}님! 환영합니다.`);
                 localStorage.setItem('samchiri_login_user', JSON.stringify(foundUser));
                 closeModal('loginModal');
-                // 나중에 메인 화면이나 게시판으로 전환하는 코드를 여기에 추가할 수 있습니다.
+
+                // 관리자일 경우 승인 버튼 노출
+                if (foundUser.isAdmin) {
+                    document.getElementById('adminBtn').style.display = 'block';
+                    alert('관리자 모드가 활성화되었습니다. 우측의 [가입승인관리] 버튼을 눌러 친구들을 승인해 주세요.');
+                }
             } else {
-                alert('아이디나 비밀번호가 틀렸습니다. 다시 확인해 보세요!');
+                alert('아이디나 비밀번호가 틀렸습니다.');
             }
+        }
+
+        // 관리자 모달 열기 (대기 목록 불러오기)
+        function openAdminModal() {
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            const pendingListDiv = document.getElementById('pendingList');
+            pendingListDiv.innerHTML = '';
+
+            const pendingUsers = users.filter(user => !user.approved);
+
+            if (pendingUsers.length === 0) {
+                pendingListDiv.innerHTML = '<p style="text-align:center; color:#aaa; padding: 20px;">대기 중인 친구가 없습니다.</p>';
+            } else {
+                pendingUsers.forEach(user => {
+                    const item = document.createElement('div');
+                    item.className = 'admin-item';
+                    item.innerHTML = `
+                        <span>${user.name} (${user.id})</span>
+                        <div>
+                            <button class="approve" onclick="approveUser('${user.id}')">승인</button>
+                            <button onclick="rejectUser('${user.id}')">거절</button>
+                        </div>
+                    `;
+                    pendingListDiv.appendChild(item);
+                });
+            }
+            openModal('adminModal');
+        }
+
+        // 가입 승인
+        function approveUser(userId) {
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            users = users.map(user => {
+                if (user.id === userId) user.approved = true;
+                return user;
+            });
+            localStorage.setItem('samchiri_users', JSON.stringify(users));
+            alert('승인되었습니다!');
+            openAdminModal(); // 목록 새로고침
+        }
+
+        // 가입 거절 (삭제)
+        function rejectUser(userId) {
+            let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+            users = users.filter(user => user.id !== userId);
+            localStorage.setItem('samchiri_users', JSON.stringify(users));
+            alert('거절(삭제)되었습니다.');
+            openAdminModal(); // 목록 새로고침
         }
     </script>
 
