@@ -55,8 +55,18 @@
             z-index: 1;
         }
 
-        .sub-header h2 { font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .sub-header h2 { font-size: 2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); display: flex; align-items: center; gap: 10px; }
         
+        /* 알림 뱃지 스타일 */
+        .notif-badge {
+            background-color: #d9534f;
+            color: white;
+            font-size: 1.1rem;
+            padding: 2px 8px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
         .back-btn {
             background: rgba(255,255,255,0.1);
             color: #fff;
@@ -230,7 +240,7 @@
             border-radius: 10px;
             padding: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
             position: relative;
             box-shadow: 0 15px 30px rgba(0,0,0,0.6);
@@ -283,6 +293,29 @@
         }
         .poll-btn:hover { background: rgba(140, 210, 255, 0.4); }
 
+        .nolit-box {
+            background: rgba(217, 83, 79, 0.15);
+            border: 1px dashed #d9534f;
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .nudge-btn {
+            width: 100%;
+            margin-top: 6px;
+            padding: 6px;
+            background-color: #d9534f;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .nudge-btn:hover { background-color: #c9302c; }
+
         .close-btn {
             position: absolute; top: 10px; right: 15px; background: none; border: none;
             color: #fff; font-size: 1.6rem; cursor: pointer; font-family: sans-serif;
@@ -300,7 +333,7 @@
 
     <div class="blackboard-frame">
         <div class="sub-header">
-            <h2>📅 모임 일정 & 투표</h2>
+            <h2>📅 모임 일정 & 투표 <span id="headerBadge"></span></h2>
             <a href="index.html" class="back-btn">돌아가기</a>
         </div>
 
@@ -345,8 +378,8 @@
             </div>
 
             <div id="pollBox" style="display: none;">
-                <input type="text" id="pollOpt1" placeholder="선택지 1 (예: 서울 강남)">
-                <input type="text" id="pollOpt2" placeholder="선택지 2 (예: 평택 본토)">
+                <input type="text" id="pollOpt1" placeholder="선택지 1 (예: 참석)">
+                <input type="text" id="pollOpt2" placeholder="선택지 2 (예: 불참)">
             </div>
 
             <div class="modal-buttons">
@@ -379,8 +412,29 @@
                 window.location.href = 'index.html';
                 return;
             }
+            checkUnvotedPollsOnLoad();
             renderCalendar();
         };
+
+        // 페이지 들어올 때 미투표 항목이 있으면 확인하고 자동으로 첫 번째 미투표 팝업 띄우기
+        function checkUnvotedPollsOnLoad() {
+            const schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
+            let unvotedPolls = schedules.filter(item => {
+                if (item.type !== 'poll') return false;
+                let voted = false;
+                Object.values(item.votes).forEach(arr => {
+                    if (arr.includes(loginUser.name)) voted = true;
+                });
+                return !voted;
+            });
+
+            const badge = document.getElementById('headerBadge');
+            if (unvotedPolls.length > 0) {
+                badge.innerHTML = `<span class="notif-badge">미투표 ${unvotedPolls.length}</span>`;
+            } else {
+                badge.innerHTML = '';
+            }
+        }
 
         let currentDate = new Date();
 
@@ -392,7 +446,6 @@
 
             const firstDayIndex = new Date(year, month, 1).getDay();
             const lastDay = new Date(year, month + 1, 0).getDate();
-            const prevLastDay = new Date(year, month, 0).getDate();
 
             const grid = document.getElementById('calGrid');
             grid.innerHTML = '';
@@ -475,7 +528,12 @@
                             if (item.type === 'poll') {
                                 let totalVotes = 0;
                                 if (item.votes) Object.values(item.votes).forEach(arr => totalVotes += arr.length);
-                                bar.innerText = `📊 ${item.text} (${totalVotes})`;
+                                
+                                // 내가 투표 안했으면 빨간점 표시
+                                let voted = false;
+                                Object.values(item.votes).forEach(arr => { if (arr.includes(loginUser.name)) voted = true; });
+                                
+                                bar.innerText = `${voted ? '📊' : '🔴 [미투표]'} ${item.text} (${totalVotes})`;
                             } else {
                                 bar.innerText = item.text;
                             }
@@ -565,8 +623,8 @@
             localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
             
             alert('일정이 성공적으로 등록되었습니다!');
-
             closeModal('addModal');
+            checkUnvotedPollsOnLoad();
             renderCalendar();
         }
 
@@ -585,6 +643,17 @@
             if (item.type === 'poll') {
                 html += `<p style="margin-bottom:6px; color:#a0d8a0;"><b>[선택지 투표 현황]</b></p>`;
                 
+                // 회원가입된 친구들 목록 가져오기 (예시로 가상 명부 활용 혹은 기존 등록 회원 연동)
+                let members = JSON.parse(localStorage.getItem('samchiri_members') || '["김민수", "박지호", "이민석", "이홍찬"]');
+                if (!members.includes(loginUser.name)) members.push(loginUser.name);
+
+                // 이미 투표한 사람들의 이름 모음
+                let votedNames = [];
+                Object.values(item.votes).forEach(arr => votedNames.push(...arr));
+
+                // 미투표자 계산
+                let unvotedNames = members.filter(m => !votedNames.includes(m));
+
                 item.options.forEach((opt, idx) => {
                     let voters = item.votes[idx] || [];
                     html += `
@@ -595,6 +664,21 @@
                         </div>
                     `;
                 });
+
+                // 미투표자 리스트 및 관리자 독촉 버튼 표시
+                html += `
+                    <div class="nolit-box">
+                        <div style="color:#ff9999; font-weight:bold;">❌ 미투표자 (${unvotedNames.length}명)</div>
+                        <div style="font-size:1rem; color:#eee; margin-top:2px;">${unvotedNames.length > 0 ? unvotedNames.join(', ') : '모두 투표 완료! 🎉'}</div>
+                `;
+
+                // 관리자 권한 확인 (예시로 작성자이거나 특정 이름이면 관리자로 인정)
+                if (loginUser.name === item.author || loginUser.name === '이홍찬') {
+                    html += `
+                        <button class="nudge-btn" onclick="sendNudgeAlert('${item.text}', '${unvotedNames.join(', ')}')">📢 미투표자들에게 독촉 알림 보내기</button>
+                    `;
+                }
+                html += `</div>`;
             }
 
             document.getElementById('detailBody').innerHTML = html;
@@ -606,7 +690,6 @@
             let item = schedules.find(s => s.id === scheduleId);
             if (!item) return;
 
-            // 기존에 어디에 투표했었는지 확인
             let previouslyVotedOpt = -1;
             Object.keys(item.votes).forEach(key => {
                 if (item.votes[key].includes(loginUser.name)) {
@@ -614,18 +697,15 @@
                 }
             });
 
-            // 이미 같은 곳에 투표한 경우
             if (previouslyVotedOpt === optIndex) {
                 alert('이미 이 선택지에 투표하셨습니다!');
                 return;
             }
 
-            // 기존 투표 기록 전체 제거 (어디에 있든)
             Object.keys(item.votes).forEach(key => {
                 item.votes[key] = item.votes[key].filter(name => name !== loginUser.name);
             });
 
-            // 새로운 선택지에 추가
             item.votes[optIndex].push(loginUser.name);
 
             localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
@@ -636,8 +716,13 @@
                 alert('투표가 완료되었습니다!');
             }
 
+            checkUnvotedPollsOnLoad();
             openDetailModal(scheduleId);
             renderCalendar();
+        }
+
+        function sendNudgeAlert(title, unvotedList) {
+            alert(`[관리자 알림 전송]\n\n"${title}" 투표를 하지 않은 미투표자(${unvotedList})들에게 독촉 메시지를 발송했습니다!`);
         }
 
         function deleteSchedule() {
@@ -647,6 +732,7 @@
                 localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
                 alert('일정이 삭제되었습니다.');
                 closeModal('detailModal');
+                checkUnvotedPollsOnLoad();
                 renderCalendar();
             }
         }
