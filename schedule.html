@@ -46,7 +46,6 @@
             pointer-events: none;
         }
 
-        /* 상단 헤더 */
         .sub-header {
             display: flex;
             justify-content: space-between;
@@ -73,7 +72,6 @@
 
         .back-btn:hover { background: rgba(255,255,255,0.1); }
 
-        /* 타임트리 스타일 달력 컨테이너 */
         .calendar-container {
             display: flex;
             flex-direction: column;
@@ -105,7 +103,6 @@
 
         .cal-nav button:hover { background: rgba(255,255,255,0.1); }
 
-        /* 요일 헤더 */
         .cal-weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -119,7 +116,6 @@
         .cal-weekdays div:first-child { color: #ff9999; }
         .cal-weekdays div:last-child { color: #99ccff; }
 
-        /* 날짜 그리드 */
         .cal-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
@@ -145,7 +141,6 @@
         .cal-day:hover { background: rgba(255, 255, 255, 0.12); }
         .cal-day.other-month { color: rgba(255, 255, 255, 0.3); }
 
-        /* 오늘 날짜 강조 스타일 (분필 동그라미 느낌) */
         .cal-day.today {
             background: rgba(160, 216, 160, 0.15);
             border: 2px solid #a0d8a0;
@@ -162,6 +157,7 @@
             font-weight: bold;
         }
 
+        /* 기간 일정 스타일 */
         .cal-event {
             background: rgba(255, 235, 150, 0.85);
             color: #2b3e32;
@@ -189,6 +185,25 @@
             white-space: nowrap;
         }
 
+        /* 상단 우측에 새 일정 추가 버튼 배치 */
+        .add-event-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+            z-index: 1;
+        }
+        .add-event-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.3rem;
+            cursor: pointer;
+        }
+        .add-event-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
         /* 팝업 모달 */
         .modal {
             display: none;
@@ -207,25 +222,28 @@
             border-radius: 8px;
             padding: 25px;
             width: 100%;
-            max-width: 400px;
+            max-width: 420px;
             text-align: center;
             position: relative;
             box-shadow: 0 10px 25px rgba(0,0,0,0.5);
             color: #fff;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-content h2 { font-size: 2rem; margin-bottom: 15px; }
         .modal-content input, .modal-content select {
-            width: 100%; padding: 8px 10px; margin-bottom: 12px;
+            width: 100%; padding: 8px 10px; margin-bottom: 10px;
             background: rgba(255, 255, 255, 0.1); border: 2px solid rgba(255, 255, 255, 0.4);
             border-radius: 4px; color: #fff; font-family: 'Nanum Pen Script', cursive; font-size: 1.3rem; outline: none;
         }
         .modal-content input::placeholder { color: rgba(255, 255, 255, 0.5); }
-        
+        .modal-content label { font-size: 1.3rem; display: block; text-align: left; margin-bottom: 5px; color: #a0d8a0; }
+
         .modal-buttons {
             display: flex;
             gap: 10px;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
         .modal-buttons button {
@@ -235,12 +253,34 @@
         }
         .modal-buttons button.delete-btn { background-color: #a94442; border-color: #ebccd1; }
 
+        /* 투표 참여 리스트 스타일 */
+        .poll-item-box {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 10px;
+            text-align: left;
+        }
+        .poll-btn {
+            width: 100%;
+            padding: 6px;
+            margin-top: 5px;
+            background: rgba(173, 216, 230, 0.2);
+            border: 1px solid #add8e6;
+            color: #fff;
+            border-radius: 4px;
+            font-family: 'Nanum Pen Script', cursive;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+        .poll-btn:hover { background: rgba(173, 216, 230, 0.4); }
+
         .close-btn {
             position: absolute; top: 10px; right: 15px; background: none; border: none;
             color: #fff; font-size: 1.6rem; cursor: pointer; font-family: sans-serif;
         }
 
-        /* 하단 분필 받침대 */
         .chalkboard-ledge {
             position: absolute; bottom: -12px; left: 5%; width: 90%; height: 10px;
             background-color: #65300e; border-radius: 2px; box-shadow: 0 5px 10px rgba(0,0,0,0.4);
@@ -255,6 +295,10 @@
         <div class="sub-header">
             <h2>📅 모임 일정 & 투표</h2>
             <a href="index.html" class="back-btn">돌아가기</a>
+        </div>
+
+        <div class="add-event-bar">
+            <button class="add-event-btn" onclick="openAddModal()">+ 일정/투표 등록</button>
         </div>
 
         <div class="calendar-container">
@@ -275,32 +319,53 @@
         </div>
     </div>
 
-    <!-- 일정 및 투표 추가 팝업 모달 -->
-    <div id="eventModal" class="modal">
+    <!-- 일정/투표 추가 모달 -->
+    <div id="addModal" class="modal">
         <div class="modal-content">
-            <button class="close-btn" onclick="closeModal()">&times;</button>
-            <h2 id="modalDateTitle">일정 추가</h2>
-            <input type="text" id="eventText" placeholder="내용을 입력하세요 (예: 정기 모임)">
+            <button class="close-btn" onclick="closeModal('addModal')">&times;</button>
+            <h2>새 일정 및 투표 등록</h2>
             
-            <div style="text-align: left; margin-bottom: 12px; font-size: 1.2rem;">
-                <label><input type="checkbox" id="isPollCheck" onchange="togglePollOptions()"> 📊 투표 기능 함께 열기</label>
+            <label>제목 / 내용</label>
+            <input type="text" id="schedText" placeholder="예: 평고 63회 가을 여행">
+            
+            <label>시작일</label>
+            <input type="date" id="schedStart">
+            
+            <label>종료일 (하루일 경우 시작일과 같게)</label>
+            <input type="date" id="schedEnd">
+
+            <div style="text-align: left; margin: 10px 0; font-size: 1.3rem;">
+                <label style="display:inline;"><input type="checkbox" id="isPollCheck" onchange="togglePollBox()"> 📊 투표 함께 만들기</label>
             </div>
 
-            <div id="pollOptionsBox" style="display: none;">
-                <input type="text" id="pollOpt1" placeholder="투표 선택지 1 (예: 평택역)">
-                <input type="text" id="pollOpt2" placeholder="투표 선택지 2 (예: 송탄)">
+            <div id="pollBox" style="display: none;">
+                <input type="text" id="pollOpt1" placeholder="선택지 1 (예: 서울 강남)">
+                <input type="text" id="pollOpt2" placeholder="선택지 2 (예: 평택 본토)">
             </div>
 
             <div class="modal-buttons">
-                <button class="delete-btn" id="deleteBtn" onclick="deleteEvent()" style="display:none;">삭제</button>
-                <button class="submit-btn" onclick="saveEvent()">저장하기</button>
+                <button class="submit-btn" onclick="saveSchedule()">등록하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 투표 참여 및 상세 확인 모달 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            <h2 id="detailTitle">일정 상세</h2>
+            <div id="detailBody" style="margin-bottom: 15px; font-size: 1.4rem; text-align: left;"></div>
+            
+            <div class="modal-buttons">
+                <button class="delete-btn" onclick="deleteSchedule()">일정 삭제</button>
+                <button class="submit-btn" onclick="closeModal('detailModal')">닫기</button>
             </div>
         </div>
     </div>
 
     <script>
         let loginUser = null;
-        let selectedDateStr = null;
+        let currentEditingId = null;
 
         window.onload = function() {
             loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
@@ -327,7 +392,7 @@
             const grid = document.getElementById('calGrid');
             grid.innerHTML = '';
 
-            const savedEvents = JSON.parse(localStorage.getItem('samchiri_events') || '{}');
+            const schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
             const today = new Date();
             const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
             const todayDate = today.getDate();
@@ -347,37 +412,36 @@
                 
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
                 
-                // 오늘 날짜 강조 클래스 부여
                 if (isCurrentMonth && i === todayDate) {
                     dayDiv.classList.add('today');
                 }
 
                 dayDiv.innerHTML = `<span class="day-num">${i}</span>`;
 
-                // 저장된 일정 또는 투표 표시
-                if (savedEvents[dateStr]) {
-                    const item = savedEvents[dateStr];
-                    if (item.type === 'poll') {
-                        const pollDiv = document.createElement('div');
-                        pollDiv.className = 'cal-poll';
-                        let totalVotes = 0;
-                        if(item.votes) {
-                            Object.values(item.votes).forEach(v => totalVotes += v.length);
+                // 해당 날짜에 포함되는 일정/투표 찾기
+                schedules.forEach(item => {
+                    if (dateStr >= item.start && dateStr <= item.end) {
+                        const div = document.createElement('div');
+                        if (item.type === 'poll') {
+                            div.className = 'cal-poll';
+                            let totalVotes = 0;
+                            if(item.votes) {
+                                Object.values(item.votes).forEach(arr => totalVotes += arr.length);
+                            }
+                            div.innerText = `📊 ${item.text} (${totalVotes})`;
+                        } else {
+                            div.className = 'cal-event';
+                            div.innerText = item.text;
                         }
-                        pollDiv.innerText = `📊 [투표] ${item.text} (${totalVotes}표)`;
-                        dayDiv.appendChild(pollDiv);
-                    } else {
-                        const eventDiv = document.createElement('div');
-                        eventDiv.className = 'cal-event';
-                        eventDiv.innerText = item.text;
-                        dayDiv.appendChild(eventDiv);
+                        
+                        // 클릭 시 상세 보기 및 투표 참여 팝업
+                        div.onclick = (e) => {
+                            e.stopPropagation();
+                            openDetailModal(item.id);
+                        };
+                        dayDiv.appendChild(div);
                     }
-                }
-
-                // 날짜 클릭 시 팝업 열기
-                dayDiv.onclick = function() {
-                    openModal(dateStr, savedEvents[dateStr]);
-                };
+                });
 
                 grid.appendChild(dayDiv);
             }
@@ -388,91 +452,128 @@
             renderCalendar();
         }
 
-        // 팝업 열기
-        function openModal(dateStr, existingData) {
-            selectedDateStr = dateStr;
-            document.getElementById('modalDateTitle').innerText = `${dateStr} 일정`;
-            document.getElementById('eventText').value = existingData ? existingData.text : '';
-            
-            const isPollCheck = document.getElementById('isPollCheck');
-            const pollBox = document.getElementById('pollOptionsBox');
-            const deleteBtn = document.getElementById('deleteBtn');
-
-            if (existingData) {
-                deleteBtn.style.display = 'block';
-                if (existingData.type === 'poll') {
-                    isPollCheck.checked = true;
-                    pollBox.style.display = 'block';
-                    document.getElementById('pollOpt1').value = existingData.options[0] || '';
-                    document.getElementById('pollOpt2').value = existingData.options[1] || '';
-                } else {
-                    isPollCheck.checked = false;
-                    pollBox.style.display = 'none';
-                }
-            } else {
-                deleteBtn.style.display = 'none';
-                isPollCheck.checked = false;
-                pollBox.style.display = 'none';
-                document.getElementById('eventText').value = '';
-                document.getElementById('pollOpt1').value = '';
-                document.getElementById('pollOpt2').value = '';
-            }
-
-            document.getElementById('eventModal').style.display = 'flex';
+        function openAddModal() {
+            document.getElementById('schedText').value = '';
+            document.getElementById('schedStart').value = '';
+            document.getElementById('schedEnd').value = '';
+            document.getElementById('isPollCheck').checked = false;
+            document.getElementById('pollBox').style.display = 'none';
+            document.getElementById('pollOpt1').value = '';
+            document.getElementById('pollOpt2').value = '';
+            document.getElementById('addModal').style.display = 'flex';
         }
 
-        function closeModal() {
-            document.getElementById('eventModal').style.display = 'none';
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
         }
 
-        function togglePollOptions() {
+        function togglePollBox() {
             const isChecked = document.getElementById('isPollCheck').checked;
-            document.getElementById('pollOptionsBox').style.display = isChecked ? 'block' : 'none';
+            document.getElementById('pollBox').style.display = isChecked ? 'block' : 'none';
         }
 
-        // 일정 및 투표 저장
-        function saveEvent() {
-            const text = document.getElementById('eventText').value.trim();
-            if (!text) {
-                alert('내용을 입력해주세요!');
+        // 일정 및 투표 저장 (기간 설정 지원)
+        function saveSchedule() {
+            const text = document.getElementById('schedText').value.trim();
+            const start = document.getElementById('schedStart').value;
+            const end = document.getElementById('schedEnd').value || start;
+
+            if (!text || !start) {
+                alert('제목과 시작일을 모두 입력해주세요!');
+                return;
+            }
+            if (end < start) {
+                alert('종료일이 시작일보다 빠를 수 없습니다!');
                 return;
             }
 
-            let events = JSON.parse(localStorage.getItem('samchiri_events') || '{}');
+            let schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
             const isPoll = document.getElementById('isPollCheck').checked;
+
+            let newEntry = {
+                id: Date.now(),
+                text: text,
+                start: start,
+                end: end,
+                author: loginUser.name,
+                type: isPoll ? 'poll' : 'event'
+            };
 
             if (isPoll) {
                 const opt1 = document.getElementById('pollOpt1').value.trim();
                 const opt2 = document.getElementById('pollOpt2').value.trim();
                 if (!opt1 || !opt2) {
-                    alert('투표 선택지를 최소 2개 다 적어주세요!');
+                    alert('투표 선택지를 2개 모두 입력해주세요!');
                     return;
                 }
-                events[selectedDateStr] = {
-                    type: 'poll',
-                    text: text,
-                    options: [opt1, opt2],
-                    votes: { 0: [], 1: [] }
-                };
-            } else {
-                events[selectedDateStr] = {
-                    type: 'event',
-                    text: text
-                };
+                newEntry.options = [opt1, opt2];
+                newEntry.votes = { 0: [], 1: [] }; // index별 참여자 이름 배열
             }
 
-            localStorage.setItem('samchiri_events', JSON.stringify(events));
-            closeModal();
+            schedules.push(newEntry);
+            localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
+            closeModal('addModal');
             renderCalendar();
         }
 
+        // 상세 및 투표 참여 팝업 열기
+        function openDetailModal(id) {
+            currentEditingId = id;
+            let schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
+            const item = schedules.find(s => s.id === id);
+            if (!item) return;
+
+            document.getElementById('detailTitle').innerText = item.type === 'poll' ? '📊 투표 참여하기' : '📅 일정 상세';
+            
+            let html = `<p><b>내용:</b> ${item.text}</p>`;
+            html += `<p><b>기간:</b> ${item.start} ~ ${item.end}</p>`;
+            html += `<p><b>작성자:</b> ${item.author}</p><hr style="border-color:rgba(255,255,255,0.2); margin:10px 0;">`;
+
+            if (item.type === 'poll') {
+                html += `<p style="margin-bottom:8px; color:#a0d8a0;"><b>[선택지 투표 현황]</b></p>`;
+                
+                item.options.forEach((opt, idx) => {
+                    let voters = item.votes[idx] || [];
+                    html += `
+                        <div class="poll-item-box">
+                            <div><b>${opt}</b> (${voters.length}표)</div>
+                            <div style="font-size:1.1rem; color:#ccc; margin:3px 0;">참여자: ${voters.length > 0 ? voters.join(', ') : '없음'}</div>
+                            <button class="poll-btn" onclick="castVote(${item.id}, ${idx})">이 선택지에 투표하기 👍</button>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('detailBody').innerHTML = html;
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        // 투표 참여하기 실행
+        function castVote(scheduleId, optIndex) {
+            let schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
+            let item = schedules.find(s => s.id === scheduleId);
+            if (!item) return;
+
+            // 이미 다른 곳에 투표했는지 확인 후 중복 제거 또는 이동
+            Object.keys(item.votes).forEach(key => {
+                item.votes[key] = item.votes[key].filter(name => name !== loginUser.name);
+            });
+
+            // 선택한 항목에 내 이름 추가
+            item.votes[optIndex].push(loginUser.name);
+
+            localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
+            openDetailModal(scheduleId); // 팝업 새로고침
+            renderCalendar(); // 달력 새로고침
+        }
+
         // 일정 삭제
-        function deleteEvent() {
+        function deleteSchedule() {
             if (confirm('이 일정을 삭제하시겠습니까?')) {
-                let events = JSON.parse(localStorage.getItem('samchiri_events') || '{}');
-                delete events[selectedDateStr];
-                localStorage.setItem('samchiri_events', JSON.stringify(events));
-                closeModal();
+                let schedules = JSON.parse(localStorage.getItem('samchiri_schedules') || '[]');
+                schedules = schedules.filter(s => s.id !== currentEditingId);
+                localStorage.setItem('samchiri_schedules', JSON.stringify(schedules));
+                closeModal('detailModal');
                 renderCalendar();
             }
         }
