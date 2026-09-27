@@ -128,7 +128,7 @@
       border-bottom: 2px dashed rgba(255,255,255,0.4);
       padding-bottom: 15px;
       margin-bottom: 25px;
-      padding-right: 120px;
+      padding-right: 140px;
       gap: 5px;
     }
 
@@ -137,7 +137,10 @@
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
 
-    .agit-header .welcome-text {
+    .agit-header .welcome-container {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 1.3rem;
       color: #f0ad4e;
     }
@@ -260,7 +263,10 @@
     <div id="agitView">
       <div class="agit-header">
         <h2>삼치리 아지트 🏫</h2>
-        <span class="welcome-text" id="welcomeMsg"></span>
+        <div class="welcome-container">
+          <span id="crownIcon" style="display:none; font-size:1.4rem;">👑</span>
+          <span id="welcomeMsg"></span>
+        </div>
       </div>
 
       <div class="menu-grid">
@@ -278,6 +284,7 @@
     </div>
   </div>
 
+  <!-- 로그인 모달 -->
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
@@ -288,6 +295,7 @@
     </div>
   </div>
 
+  <!-- 회원가입 모달 -->
   <div id="signupModal" class="modal">
     <div class="modal-content">
       <button class="close-btn" onclick="closeModal('signupModal')">&times;</button>
@@ -299,37 +307,28 @@
     </div>
   </div>
 
-  <div id="adminModal" class="modal">
-    <div class="modal-content" style="max-width: 400px;">
-      <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
-      <h2>가입 대기 목록</h2>
-      <div id="pendingList" style="text-align: left; margin-top: 15px;"></div>
-    </div>
-  </div>
-
   <script>
-    // 접속할 때마다 관리자 계정 정보를 강제로 최신화
     let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+    const adminData = { id: 'jclee17', pw: 'Ljhjc0808!', name: '관리자', approved: true, isAdmin: true, role: '관리자' };
+    
     let adminIndex = users.findIndex(u => u.isAdmin);
-    
-    const adminData = { id: 'jclee17', pw: 'Ljhjc0808!', name: '관리자', approved: true, isAdmin: true };
-    
     if (adminIndex !== -1) {
-      users[adminIndex] = adminData; // 기존 관리자 정보 강제 덮어쓰기
+      users[adminIndex] = { ...adminData, role: users[adminIndex].role || '관리자' };
     } else {
       users.push(adminData);
     }
     localStorage.setItem('samchiri_users', JSON.stringify(users));
 
     window.onload = function() {
-      const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
+      let loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
       if (loginUser) {
-        // 만약 로그인된 유저가 옛날 어드민 계정이면 최신 정보로 동기화
-        if (loginUser.isAdmin) {
-          localStorage.setItem('samchiri_login_user', JSON.stringify(adminData));
-          showAgitView(adminData);
+        users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+        const currentFreshUser = users.find(u => u.id === loginUser.id);
+        if (currentFreshUser) {
+          localStorage.setItem('samchiri_login_user', JSON.stringify(currentFreshUser));
+          showAgitView(currentFreshUser);
         } else {
-          showAgitView(loginUser);
+          showHomeView();
         }
       } else {
         showHomeView();
@@ -349,7 +348,7 @@
       let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
       if (users.some(u => u.id === id)) { alert('이미 존재하는 아이디입니다!'); return; }
 
-      users.push({ id, pw, name, approved: false, isAdmin: false });
+      users.push({ id, pw, name, approved: false, isAdmin: false, role: '일반회원' });
       localStorage.setItem('samchiri_users', JSON.stringify(users));
       
       alert('가입 신청 완료! 관리자 승인을 기다려주세요.');
@@ -394,52 +393,21 @@
       document.getElementById('agitView').style.display = 'flex';
       document.getElementById('welcomeMsg').innerText = `${user.name}님 환영해요!`;
 
+      const crownIcon = document.getElementById('crownIcon');
+      if (user.role === '계장') {
+        crownIcon.style.display = 'inline';
+      } else {
+        crownIcon.style.display = 'none';
+      }
+
       let menuHtml = '';
       if (user.isAdmin) {
-        menuHtml += `<button onclick="openAdminModal()" style="color: #f0ad4e; border-color: #f0ad4e;">승인관리</button>`;
+        // 관리자일 경우 클릭하면 admin.html 페이지로 이동
+        menuHtml += `<button onclick="location.href='admin.html'" style="color: #f0ad4e; border-color: #f0ad4e;">사용자관리</button>`;
       }
       menuHtml += `<button onclick="handleLogout()" style="color: #ff9999; border-color: #ff9999;">로그아웃</button>`;
       
       document.getElementById('topRightMenu').innerHTML = menuHtml;
-    }
-
-    function openAdminModal() {
-      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-      const pendingListDiv = document.getElementById('pendingList');
-      pendingListDiv.innerHTML = '';
-
-      const pendingUsers = users.filter(u => !u.approved);
-      if (pendingUsers.length === 0) {
-        pendingListDiv.innerHTML = '<p style="text-align:center; color:#aaa; padding: 15px;">대기 중인 친구가 없습니다.</p>';
-      } else {
-        pendingUsers.forEach(u => {
-          const item = document.createElement('div');
-          item.style.cssText = "display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.08); padding:8px; margin-bottom:6px; border-radius:4px; font-size:1.3rem;";
-          item.innerHTML = `
-            <span>${u.name} (${u.id})</span>
-            <div>
-              <button onclick="approveUser('${u.id}')" style="background:#5cb85c; color:#fff; border:none; padding:2px 8px; border-radius:3px; font-family:'Nanum Pen Script'; font-size:1.1rem; cursor:pointer; margin-right:4px;">승인</button>
-              <button onclick="rejectUser('${u.id}')" style="background:#d9534f; color:#fff; border:none; padding:2px 8px; border-radius:3px; font-family:'Nanum Pen Script'; font-size:1.1rem; cursor:pointer;">거절</button>
-            </div>
-          `;
-          pendingListDiv.appendChild(item);
-        });
-      }
-      openModal('adminModal');
-    }
-
-    function approveUser(userId) {
-      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-      users = users.map(u => { if (u.id === userId) u.approved = true; return u; });
-      localStorage.setItem('samchiri_users', JSON.stringify(users));
-      openAdminModal();
-    }
-
-    function rejectUser(userId) {
-      let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
-      users = users.filter(u => u.id !== userId);
-      localStorage.setItem('samchiri_users', JSON.stringify(users));
-      openAdminModal();
     }
   </script>
 </body>
