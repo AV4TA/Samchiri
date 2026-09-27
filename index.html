@@ -47,7 +47,6 @@
       pointer-events: none;
     }
 
-    /* 우측 상단 메뉴 버튼 그룹 (겹침 방지를 위해 너비 확보 및 위치 조정) */
     .top-right-menu {
       position: absolute;
       top: 20px;
@@ -74,7 +73,6 @@
       border-style: solid;
     }
 
-    /* 1. 메인 홈 화면 */
     #homeView {
       display: flex;
       flex-direction: column;
@@ -114,7 +112,6 @@
       text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
     }
 
-    /* 2. 로그인 후 아지트 대시보드 화면 */
     #agitView {
       display: none;
       flex-direction: column;
@@ -131,7 +128,7 @@
       border-bottom: 2px dashed rgba(255,255,255,0.4);
       padding-bottom: 15px;
       margin-bottom: 25px;
-      padding-right: 120px; /* 우측 버튼 영역과 겹치지 않게 여백 확보 */
+      padding-right: 120px;
       gap: 5px;
     }
 
@@ -177,7 +174,6 @@
     .menu-card h3 { font-size: 1.8rem; margin-bottom: 4px; }
     .menu-card p { font-size: 1.2rem; color: #ccc; }
 
-    /* 모달 */
     .modal {
       display: none;
       position: fixed;
@@ -243,13 +239,11 @@
 
   <div class="blackboard-frame">
     
-    <!-- 우측 상단 메뉴 -->
     <div class="top-right-menu" id="topRightMenu">
       <button onclick="openModal('loginModal')">로그인</button>
       <button onclick="openModal('signupModal')">회원가입</button>
     </div>
 
-    <!-- 1. 메인 홈 화면 -->
     <div id="homeView">
       <div class="center-title">
         <h1>삼치리</h1>
@@ -263,7 +257,6 @@
       </div>
     </div>
 
-    <!-- 2. 로그인 후 아지트 대시보드 화면 -->
     <div id="agitView">
       <div class="agit-header">
         <h2>삼치리 아지트 🏫</h2>
@@ -285,7 +278,6 @@
     </div>
   </div>
 
-  <!-- 로그인 모달 -->
   <div id="loginModal" class="modal">
     <div class="modal-content">
       <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
@@ -296,7 +288,6 @@
     </div>
   </div>
 
-  <!-- 회원가입 모달 -->
   <div id="signupModal" class="modal">
     <div class="modal-content">
       <button class="close-btn" onclick="closeModal('signupModal')">&times;</button>
@@ -308,7 +299,6 @@
     </div>
   </div>
 
-  <!-- 관리자 승인 모달 -->
   <div id="adminModal" class="modal">
     <div class="modal-content" style="max-width: 400px;">
       <button class="close-btn" onclick="closeModal('adminModal')">&times;</button>
@@ -318,17 +308,29 @@
   </div>
 
   <script>
-    if (!localStorage.getItem('samchiri_users')) {
-      const initialUsers = [
-        { id: 'jclee17', pw: 'Ljhjc0808!', name: '관리자', approved: true, isAdmin: true }
-      ];
-      localStorage.setItem('samchiri_users', JSON.stringify(initialUsers));
+    // 접속할 때마다 관리자 계정 정보를 강제로 최신화
+    let users = JSON.parse(localStorage.getItem('samchiri_users') || '[]');
+    let adminIndex = users.findIndex(u => u.isAdmin);
+    
+    const adminData = { id: 'jclee17', pw: 'Ljhjc0808!', name: '관리자', approved: true, isAdmin: true };
+    
+    if (adminIndex !== -1) {
+      users[adminIndex] = adminData; // 기존 관리자 정보 강제 덮어쓰기
+    } else {
+      users.push(adminData);
     }
+    localStorage.setItem('samchiri_users', JSON.stringify(users));
 
     window.onload = function() {
       const loginUser = JSON.parse(localStorage.getItem('samchiri_login_user'));
       if (loginUser) {
-        showAgitView(loginUser);
+        // 만약 로그인된 유저가 옛날 어드민 계정이면 최신 정보로 동기화
+        if (loginUser.isAdmin) {
+          localStorage.setItem('samchiri_login_user', JSON.stringify(adminData));
+          showAgitView(adminData);
+        } else {
+          showAgitView(loginUser);
+        }
       } else {
         showHomeView();
       }
